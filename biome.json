@@ -29,7 +29,11 @@
 			},
 			"correctness": {
 				"noUnusedVariables": "info",
-				"noUnusedFunctionParameters": "info"
+				"noUnusedFunctionParameters": "info",
+				"noUnusedImports": {
+					"fix": "safe",
+					"level": "info"
+				}
 			}
 		},
 		"domains": {
