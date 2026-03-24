@@ -1,4 +1,4 @@
-# Carot
+# Caret
 
 Cursor-inspired clone
 
