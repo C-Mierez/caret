@@ -21,11 +21,11 @@
       },
       "devDependencies": {
         "@biomejs/biome": "2.4.8",
+        "@c-mierez/biome-config": "github:c-mierez/biome-config",
         "@tailwindcss/postcss": "^4",
         "@types/node": "^20",
         "@types/react": "^19",
         "@types/react-dom": "^19",
-        "@c-mierez/biome-config": "github:c-mierez/biome-config",
         "lefthook": "^2.1.4",
         "tailwindcss": "^4",
         "typescript": "^5",

@@ -2,8 +2,6 @@ name: Code linting and formatting
 
 on:
     push:
-        branches:
-            - main
     pull_request:
 
 jobs:
