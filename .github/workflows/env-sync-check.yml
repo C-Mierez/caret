@@ -1,0 +1,21 @@
+name: Env Sync Check
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  env-sync-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate env sync
+        run: bunx --bun env-sync check
