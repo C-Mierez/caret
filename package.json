@@ -3,11 +3,12 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "next dev",
+		"dev:only": "next dev",
+		"dev": "bunx --bun concurrently \"bun run dev:only\" \"bun run convex\"",
+		"convex": "bunx --bun convex dev",
 		"build": "next build",
 		"start": "next start",
 		"lint": "biome check",
-		"convex:dev": "bunx --bun convex dev",
 		"format": "biome format --write",
 		"env:sync": "bunx --bun env-sync sync",
 		"env:check": "bunx --bun env-sync check",
@@ -39,6 +40,7 @@
 		"@types/node": "^20",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
+		"concurrently": "^9.2.1",
 		"lefthook": "^2.1.4",
 		"tailwindcss": "^4",
 		"typescript": "^5"
