@@ -23,6 +23,7 @@
 			"@modules/*": ["./src/modules/*"],
 			"@lib/*": ["./src/lib/*"],
 			"@hooks/*": ["./src/hooks/*"],
+			"@convex/*": ["./convex/*"],
 			"@/*": ["./src/*"]
 		}
 	},

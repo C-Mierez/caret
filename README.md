@@ -17,6 +17,7 @@ Cursor-inspired clone
 
 - `Biome` for linting/formatting/import organization
 - `Lefthook` for git hooks
+- `Concurrently` for parallel script running
 
 ### Personal packages
 [![Code linting and formatting](https://github.com/C-Mierez/caret/actions/workflows/biome-ci.yml/badge.svg?branch=master)](https://github.com/C-Mierez/caret/actions/workflows/biome-ci.yml)

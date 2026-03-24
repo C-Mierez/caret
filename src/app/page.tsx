@@ -3,7 +3,6 @@ import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 export default function Home() {
 	return (
 		<div>
-			{" "}
 			<Show when="signed-out">
 				<SignInButton />
 				<SignUpButton>
