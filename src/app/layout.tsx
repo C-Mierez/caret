@@ -1,8 +1,5 @@
 import "@/styles/globals.css";
-
-import { ClerkProvider } from "@clerk/nextjs";
-import { shadcn } from "@clerk/ui/themes";
-import { ThemeProvider } from "@components/providers/theme-provider";
+import Providers from "@components/providers";
 import type { Metadata } from "next";
 import { Geist, JetBrains_Mono } from "next/font/google";
 
@@ -33,20 +30,7 @@ export default function RootLayout({
 			className={`${geistSans.variable} ${jetBrainsMono.variable} h-full antialiased`}
 		>
 			<body className="min-h-full flex flex-col">
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="dark"
-					enableSystem
-					disableTransitionOnChange
-				>
-					<ClerkProvider
-						appearance={{
-							theme: shadcn,
-						}}
-					>
-						{children}
-					</ClerkProvider>
-				</ThemeProvider>
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	);
