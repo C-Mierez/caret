@@ -1,0 +1,11 @@
+name: Code linting and formatting
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+jobs:
+    quality:
+        uses: C-Mierez/biome-config/.github/workflows/biome-ci.yml@main
