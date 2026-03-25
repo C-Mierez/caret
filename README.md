@@ -12,6 +12,9 @@ Cursor-inspired clone
 - `Zod`
 - `Clerk`
 - `Convex`
+- [`Vercel AI SDK`](https://github.com/vercel/ai)
+  - Google 
+  - Anthropic
 
 ### Tooling
 
