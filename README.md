@@ -16,6 +16,7 @@ Cursor-inspired clone
   - Google 
   - Anthropic
 - `Firecrawl`
+- `Sentry` Error logging
 
 ### Tooling
 
