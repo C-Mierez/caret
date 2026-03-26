@@ -1,30 +1,30 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { withAuth } from "./lib/hoc";
 
 export const create = mutation({
 	args: {
 		name: v.string(),
 	},
-	handler: (ctx, args) => {
-		const data = ctx.db.insert("projects", {
+	handler: withAuth(async (ctx, args: { name: string }) => {
+		return await ctx.db.insert("projects", {
 			name: args.name,
-			ownerId: "123",
+			ownerId: ctx.identity.subject,
+			updated_at: Date.now(),
+			importStatus: "not_started",
+			exportStatus: "not_started",
 		});
-
-		return data;
-	},
+	}),
 });
 
-export const get = query({
-	args: {},
-	handler: async (ctx) => {
-		const id = await ctx.auth.getUserIdentity();
-
-		if (!id) {
-		}
-
-		const projects = ctx.db.query("projects").collect();
-
-		return projects;
+export const getOwnedPartial = query({
+	args: {
+		limit: v.number(),
 	},
+	handler: withAuth(async (ctx, args: { limit: number }) => {
+		return await ctx.db
+			.query("projects")
+			.withIndex("by_owner", (q) => q.eq("ownerId", ctx.identity.subject))
+			.take(args.limit);
+	}),
 });
