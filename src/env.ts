@@ -7,6 +7,8 @@ export const env = createEnv({
 		CONVEX_DEPLOYMENT: z.string(),
 		CLERK_JWT_ISSUER_DOMAIN: z.url(),
 		GEMINI_API_KEY: z.string(),
+		ANTHROPIC_API_KEY: z.string(),
+		INNGEST_DEV: z.string(),
 	},
 	client: {
 		NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
@@ -18,6 +20,8 @@ export const env = createEnv({
 		CONVEX_DEPLOYMENT: process.env.CONVEX_DEPLOYMENT,
 		CLERK_JWT_ISSUER_DOMAIN: process.env.CLERK_JWT_ISSUER_DOMAIN,
 		GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+		ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+		INNGEST_DEV: process.env.INNGEST_DEV,
 		NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
 			process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
 		NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
