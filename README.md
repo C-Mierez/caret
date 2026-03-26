@@ -15,6 +15,7 @@ Cursor-inspired clone
 - [`Vercel AI SDK`](https://github.com/vercel/ai)
   - Google 
   - Anthropic
+- `Firecrawl`
 
 ### Tooling
 

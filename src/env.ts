@@ -9,6 +9,7 @@ export const env = createEnv({
 		GEMINI_API_KEY: z.string(),
 		ANTHROPIC_API_KEY: z.string(),
 		INNGEST_DEV: z.string(),
+		FIRECRAWL_API_KEY: z.string(),
 	},
 	client: {
 		NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
@@ -22,6 +23,7 @@ export const env = createEnv({
 		GEMINI_API_KEY: process.env.GEMINI_API_KEY,
 		ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
 		INNGEST_DEV: process.env.INNGEST_DEV,
+		FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY,
 		NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
 			process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
 		NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
