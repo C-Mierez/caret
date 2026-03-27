@@ -1,0 +1,1 @@
+export const DEFAULT_PROJECTS_LIMIT = 5;

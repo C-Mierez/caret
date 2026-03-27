@@ -1,3 +1,5 @@
+import type { PaginationOptions } from "convex/server";
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { withAuth } from "./lib/hoc";
@@ -17,14 +19,41 @@ export const create = mutation({
 	}),
 });
 
-export const getOwnedPartial = query({
-	args: {
-		limit: v.number(),
-	},
-	handler: withAuth(async (ctx, args: { limit: number }) => {
+export const getOwnedAll = query({
+	args: {},
+	handler: withAuth(async (ctx) => {
 		return await ctx.db
 			.query("projects")
 			.withIndex("by_owner", (q) => q.eq("ownerId", ctx.identity.subject))
-			.take(args.limit);
+			.collect();
 	}),
+});
+
+export const getOwnedCount = query({
+	args: {},
+	handler: withAuth(async (ctx) => {
+		const projects = await ctx.db
+			.query("projects")
+			.withIndex("by_owner", (q) => q.eq("ownerId", ctx.identity.subject))
+			.collect();
+
+		return projects.length;
+	}),
+});
+
+export const getOwnedInfinite = query({
+	args: {
+		paginationOpts: paginationOptsValidator,
+	},
+	handler: withAuth(
+		async (ctx, args: { paginationOpts: PaginationOptions }) => {
+			return await ctx.db
+				.query("projects")
+				.withIndex("by_owner", (q) =>
+					q.eq("ownerId", ctx.identity.subject),
+				)
+				.order("desc")
+				.paginate(args.paginationOpts);
+		},
+	),
 });
