@@ -46,7 +46,11 @@ export function CTASection() {
 				<CTAButton
 					icon={<Sparkle />}
 					label="New Project"
-					kbd="⌘ J"
+					kbdProps={{
+						kbdKey: "j",
+						kbdKeyLabel: "J",
+						onTrigger: () => {},
+					}}
 					onClick={() => {
 						newProjectModal.openModal();
 					}}
@@ -54,7 +58,11 @@ export function CTASection() {
 				<CTAButton
 					icon={<FaGithub className="size-6" />}
 					label="Import Project"
-					kbd="⌘ I"
+					kbdProps={{
+						kbdKey: "i",
+						kbdKeyLabel: "I",
+						onTrigger: () => {},
+					}}
 					onClick={() => {}}
 				/>
 			</section>

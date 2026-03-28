@@ -1,8 +1,6 @@
-import { Kbd } from "@components/ui/kbd";
 import Image from "next/image";
 import { CTASection } from "./components/cta-section";
-import { RecentProjectCard } from "./components/recent-project-card";
-import RecentProjectList from "./components/recent-project-list";
+import RecentProjects from "./components/recent-projects";
 
 export default async function ProjectsView() {
 	return (
@@ -18,42 +16,7 @@ export default async function ProjectsView() {
 
 			<CTASection />
 
-			<section className="flex flex-col gap-2 w-full">
-				<SectionHeader title="Last Updated" />
-				<RecentProjectCard />
-			</section>
-
-			<section>
-				<SectionHeader
-					title="Recent Projects"
-					kbd={{ kbdLabel: "View all", kbdKey: "⌘ K" }}
-				/>
-				<RecentProjectList renderedAt={Date.now()} />
-			</section>
+			<RecentProjects />
 		</main>
-	);
-}
-
-function SectionHeader({
-	title,
-	kbd,
-}: {
-	title: string;
-	kbd?: { kbdLabel: string; kbdKey: string };
-}) {
-	return (
-		<header className="w-full flex justify-center gap-2">
-			<h2 className="text-muted-foreground mr-auto">{title}</h2>
-			{kbd && (
-				<div className="flex gap-2 items-center">
-					<p className="text-muted-foreground text-sm">
-						{kbd.kbdLabel}
-					</p>
-					<Kbd size={"sm"} variant={"outline"}>
-						{kbd.kbdKey}
-					</Kbd>
-				</div>
-			)}
-		</header>
 	);
 }

@@ -38,7 +38,17 @@ export default function useProjectCreate() {
 				);
 			}
 
-			// TODO Optimistic update for projects.getOwnedAll if needed
+			// Optimistic update for projects.getOwnedAll
+			const cachedQuery = localStore.getQuery(
+				api.projects.getOwnedAll,
+				{},
+			);
+			if (cachedQuery !== undefined) {
+				localStore.setQuery(api.projects.getOwnedAll, {}, [
+					newProject,
+					...cachedQuery,
+				]);
+			}
 		},
 	);
 }

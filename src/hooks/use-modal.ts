@@ -12,7 +12,7 @@ export default function useModal({
 	onOpenChange,
 	onClose,
 	onOpen,
-}: Props): ModalProps {
+}: Props = {}): ModalProps {
 	const [isOpen, setIsOpen] = useState(isModalOpen);
 
 	useEffect(() => {

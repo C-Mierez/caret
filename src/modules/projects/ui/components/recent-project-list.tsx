@@ -1,15 +1,18 @@
 "use client";
 
 import InfiniteScroller from "@components/infinite-scroller";
+import type { ModalProps } from "@hooks/use-modal";
 import { DEFAULT_PROJECTS_LIMIT } from "@lib/constants";
 import { useProjectsGetOwnedInfinite } from "@/hoc/projects-getOwnedInfinite";
+import ProjectsCommandDialog from "./projects-command-dialog";
 import RecentProjectItem from "./recent-project-item";
 
 interface Props {
 	renderedAt: number;
+	modalProps: ModalProps;
 }
 
-export default function RecentProjectList({ renderedAt }: Props) {
+export default function RecentProjectList({ renderedAt, modalProps }: Props) {
 	const {
 		recentProjects: data,
 		paginatedResult,
@@ -26,6 +29,7 @@ export default function RecentProjectList({ renderedAt }: Props) {
 
 	return (
 		<>
+			<ProjectsCommandDialog {...modalProps} />
 			<ul className="flex flex-col py-3 gap-2">
 				{data.map((project) => (
 					<li key={project._id}>
