@@ -25,6 +25,7 @@ export default function RecentProjects() {
 						onTrigger: () => {
 							cmdDialog.openModal();
 						},
+						asButton: true,
 					}}
 				/>
 				<RecentProjectList

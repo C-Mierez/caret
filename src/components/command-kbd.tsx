@@ -10,6 +10,7 @@ interface Props {
 	kbdKeyLabel: string;
 	kbdKey: Key;
 	onTrigger: () => void;
+	asButton?: boolean;
 }
 
 export default function CommandKbd({
@@ -17,6 +18,7 @@ export default function CommandKbd({
 	kbdKeyLabel,
 	kbdKey,
 	onTrigger,
+	asButton = false,
 }: Props) {
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -36,8 +38,10 @@ export default function CommandKbd({
 		};
 	}, [onTrigger, kbdKey]);
 
+	const Slot = asButton ? "button" : "div";
+
 	return (
-		<button
+		<Slot
 			type="button"
 			className="flex gap-2 items-center"
 			onClick={onTrigger}
@@ -48,6 +52,6 @@ export default function CommandKbd({
 			<Kbd size={"sm"} variant={"outline"}>
 				{`⌘ ${kbdKeyLabel}`}
 			</Kbd>
-		</button>
+		</Slot>
 	);
 }
