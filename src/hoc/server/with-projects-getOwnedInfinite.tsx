@@ -1,12 +1,16 @@
+import "server-only";
+
 import { api } from "@convex/_generated/api";
 import { DEFAULT_PROJECTS_LIMIT } from "@lib/constants";
 import { getOrRedirectConvexToken } from "@lib/server-auth";
 import { fetchQuery } from "convex/nextjs";
-import type React from "react";
-import ProjectsGetOwnedInfinite from "./projects-getOwnedInfinite";
+import ProjectsGetOwnedInfinite from "../projects-getOwnedInfinite";
+import type { ServerComponent } from "./types";
 
-export function withProjectsGetOwnedInfinite(Component: React.ComponentType) {
-	return async function WithProjectsGetOwnedInfinite() {
+export function withProjectsGetOwnedInfinite<Props extends object = object>(
+	Component: ServerComponent<Props>,
+) {
+	return async function WithProjectsGetOwnedInfinite(props: Props) {
 		const token = await getOrRedirectConvexToken();
 
 		const [initialProjectsPage, initialTotalProjects] = await Promise.all([
@@ -28,7 +32,7 @@ export function withProjectsGetOwnedInfinite(Component: React.ComponentType) {
 				initialData={initialProjectsPage}
 				initialTotalProjects={initialTotalProjects}
 			>
-				<Component />
+				<Component {...props} />
 			</ProjectsGetOwnedInfinite>
 		);
 	};
