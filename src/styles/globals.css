@@ -18,7 +18,8 @@
 	--radius-3xl: calc(var(--radius) * 2.2);
 	--radius-4xl: calc(var(--radius) * 2.6);
 
-	--screen-max: 2400px;
+	--spacing-widest: 80rem; /* Equivalent to 7xl in Tailwind */
+	--spacing-wide: 56rem; /* Equivalent to 4xl in Tailwind */
 
 	/* ---------------------------------- Theme --------------------------------- */
 	--color-foreground: var(--foreground);
@@ -63,7 +64,7 @@
 
 :root {
 	/* --------------------------------- Globals -------------------------------- */
-	--radius: 0.625rem;
+	--radius: 0rem;
 
 	/* --------------------------------- Colors --------------------------------- */
 	--color-main-950: #14171d;
@@ -146,8 +147,8 @@
 	--secondary-foreground: var(--color-main-950);
 
 	--muted: var(--color-main-800);
-	--muted-foreground: var(--color-main-300);
-	--muted-foreground-alt: var(--color-main-300);
+	--muted-foreground: var(--color-main-400);
+	--muted-foreground-alt: var(--color-main-600);
 
 	--accent: var(--color-accent-400);
 	--accent-foreground: var(--color-main-950);
@@ -203,5 +204,11 @@
 	button:disabled,
 	[role="button"]:disabled {
 		cursor: default;
+	}
+}
+
+@layer utilities {
+	.animated {
+		@apply transition-colors duration-150;
 	}
 }

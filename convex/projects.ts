@@ -1,30 +1,59 @@
+import type { PaginationOptions } from "convex/server";
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { withAuth } from "./lib/hoc";
 
 export const create = mutation({
 	args: {
 		name: v.string(),
 	},
-	handler: (ctx, args) => {
-		const data = ctx.db.insert("projects", {
+	handler: withAuth(async (ctx, args: { name: string }) => {
+		return await ctx.db.insert("projects", {
 			name: args.name,
-			ownerId: "123",
+			ownerId: ctx.identity.subject,
+			updated_at: Date.now(),
+			importStatus: "not_started",
+			exportStatus: "not_started",
 		});
-
-		return data;
-	},
+	}),
 });
 
-export const get = query({
+export const getOwnedAll = query({
 	args: {},
-	handler: async (ctx) => {
-		const id = await ctx.auth.getUserIdentity();
+	handler: withAuth(async (ctx) => {
+		return await ctx.db
+			.query("projects")
+			.withIndex("by_owner", (q) => q.eq("ownerId", ctx.identity.subject))
+			.collect();
+	}),
+});
 
-		if (!id) {
-		}
+export const getOwnedCount = query({
+	args: {},
+	handler: withAuth(async (ctx) => {
+		const projects = await ctx.db
+			.query("projects")
+			.withIndex("by_owner", (q) => q.eq("ownerId", ctx.identity.subject))
+			.collect();
 
-		const projects = ctx.db.query("projects").collect();
+		return projects.length;
+	}),
+});
 
-		return projects;
+export const getOwnedInfinite = query({
+	args: {
+		paginationOpts: paginationOptsValidator,
 	},
+	handler: withAuth(
+		async (ctx, args: { paginationOpts: PaginationOptions }) => {
+			return await ctx.db
+				.query("projects")
+				.withIndex("by_owner", (q) =>
+					q.eq("ownerId", ctx.identity.subject),
+				)
+				.order("desc")
+				.paginate(args.paginationOpts);
+		},
+	),
 });

@@ -40,7 +40,8 @@
 				"noUnusedImports": {
 					"fix": "safe",
 					"level": "info"
-				}
+				},
+				"noChildrenProp": "off"
 			}
 		},
 		"domains": {
