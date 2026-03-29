@@ -37,7 +37,7 @@ export default function InputModal({
 	onCancel,
 	...modalProps
 }: Props) {
-	const { openModalSafe, closeModalSafe, onOpenChange } = useModalHandler({
+	const { closeModalSafe, onOpenChange } = useModalHandler({
 		onOpenChange: modalProps.onOpenChange,
 	});
 
@@ -60,9 +60,9 @@ export default function InputModal({
 	}, [form, initialValue]);
 
 	const handleCancel = () => {
-		form.reset();
 		closeModalSafe();
 		onCancel?.(form.getFieldValue("input"));
+		form.reset();
 	};
 
 	return (
@@ -88,7 +88,7 @@ export default function InputModal({
 								!field.state.meta.isValid;
 
 							return (
-								<Field data-invalid={false}>
+								<Field data-invalid={isInvalid}>
 									<FieldLabel htmlFor={field.name}>
 										{title}
 									</FieldLabel>

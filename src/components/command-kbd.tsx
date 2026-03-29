@@ -22,6 +22,17 @@ export default function CommandKbd({
 }: Props) {
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
+			const target = e.target as HTMLElement | null;
+
+			// Don't trigger if the user is typing in an input, textarea, select, or contenteditable element
+			if (
+				target?.closest(
+					"input, textarea, select, [contenteditable='true']",
+				)
+			) {
+				return;
+			}
+
 			if (
 				(e.metaKey || e.ctrlKey) &&
 				e.key.toLowerCase() === kbdKey.toLowerCase()
