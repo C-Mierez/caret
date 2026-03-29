@@ -1,15 +1,20 @@
-import Image from "next/image";
+import CaretSvg from "@components/svg/caret-svg";
+import { URLs } from "@lib/urls";
+import Link from "next/link";
 import { CTASection } from "./components/cta-section";
 import RecentProjects from "./components/recent-projects";
 
 export default async function ProjectsView() {
 	return (
-		<main className="min-h-screen flex flex-col gap-8 pt-30 max-w-wide mx-auto w-full">
-			<header className="flex gap-4 items-end w-full ">
-				<div className="size-19 aspect-square relative bg-foreground rounded-md border-3 border-foreground">
-					<Image alt="caret" src={"/caret.png"} fill />
-				</div>
-				<h1 className="text-8xl font-mono font-black leading-[0.75] ">
+		<main className="mx-auto flex min-h-screen w-full max-w-wide flex-col gap-8 pt-30">
+			<header className="flex w-full items-end gap-4">
+				<Link
+					href={URLs.root}
+					className="relative aspect-square size-19 rounded-md border-3 p-1.5"
+				>
+					<CaretSvg />
+				</Link>
+				<h1 className="font-black font-mono text-8xl leading-[0.75]">
 					CARET‸
 				</h1>
 			</header>

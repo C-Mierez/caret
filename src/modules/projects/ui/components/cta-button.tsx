@@ -10,15 +10,15 @@ interface Props {
 export function CTAButton({ icon, label, kbdProps, onClick }: Props) {
 	return (
 		<button
-			className="bg-muted border-muted-foreground-alt border flex flex-col gap-8 p-4 md:p-8 text-start group hover:border-muted-foreground animated"
+			className="group animated flex flex-col gap-8 border border-muted-foreground-alt bg-muted p-4 text-start hover:border-muted-foreground md:p-8"
 			type="button"
 			onClick={onClick}
 		>
-			<div className="flex gap-2 justify-between">
+			<div className="flex justify-between gap-2">
 				{icon}
 				<CommandKbd {...kbdProps} />
 			</div>
-			<p className="text-xl font-medium">{label}</p>
+			<p className="font-medium text-xl">{label}</p>
 		</button>
 	);
 }

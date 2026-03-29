@@ -42,7 +42,7 @@ export function CTASection() {
 
 	return (
 		<>
-			<section className="grid md:grid-cols-2 gap-4 w-full">
+			<section className="grid w-full gap-4 md:grid-cols-2">
 				<CTAButton
 					icon={<Sparkle />}
 					label="New Project"

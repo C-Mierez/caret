@@ -24,7 +24,7 @@ export default function InfiniteScroller({
 			: Math.max(1, Math.ceil(totalItems / safeItemsPerPage));
 
 	return (
-		<div className="w-full grid place-items-center gap-2 py-3">
+		<div className="grid w-full place-items-center gap-2 py-3">
 			<Button
 				type="button"
 				variant={"outline"}
@@ -46,7 +46,7 @@ export default function InfiniteScroller({
 				)}
 			</Button>
 
-			<p className="text-sm text-muted-foreground-alt">
+			<p className="text-muted-foreground-alt text-sm">
 				{maxPages === null
 					? ""
 					: `${Math.min(currentPage, maxPages)} of ${maxPages}`}
