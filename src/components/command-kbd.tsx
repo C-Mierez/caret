@@ -43,11 +43,13 @@ export default function CommandKbd({
 	return (
 		<Slot
 			type="button"
-			className="flex gap-2 items-center"
+			className="flex gap-2 items-center group"
 			onClick={onTrigger}
 		>
 			{!!kbdLabel && (
-				<p className="text-muted-foreground text-sm">{kbdLabel}</p>
+				<p className="text-muted-foreground text-sm group-hover:text-foreground">
+					{kbdLabel}
+				</p>
 			)}
 			<Kbd size={"sm"} variant={"outline"}>
 				{`⌘ ${kbdKeyLabel}`}

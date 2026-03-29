@@ -30,7 +30,7 @@ export default function RecentProjectList({ renderedAt, modalProps }: Props) {
 	return (
 		<>
 			<ProjectsCommandDialog {...modalProps} />
-			<ul className="flex flex-col py-3 gap-2">
+			<ul className="flex flex-col py-3">
 				{data.map((project) => (
 					<li key={project._id}>
 						<RecentProjectItem

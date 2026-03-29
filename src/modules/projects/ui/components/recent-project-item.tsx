@@ -1,5 +1,8 @@
 import type { Doc } from "@convex/_generated/dataModel";
+import { buildProjectUrl } from "@lib/urls";
 import { formatDistance } from "date-fns";
+import Link from "next/link";
+import ProjectImportStatusIcon from "./project-import-status-icon";
 
 interface Props {
 	project: Doc<"projects">;
@@ -16,11 +19,22 @@ export default function RecentProjectItem({ project, renderedAt }: Props) {
 	);
 
 	return (
-		<div className="flex justify-between items-center gap-2">
-			<p className="text-sm line-clamp-1 flex-1">{project.name}</p>
-			<p className="text-muted-foreground-alt text-sm line-clamp-1">
+		<Link
+			href={buildProjectUrl(project._id)}
+			className="flex justify-between items-center gap-2 group py-1.5"
+		>
+			<div className="flex gap-2 items-center ">
+				<ProjectImportStatusIcon
+					status={project.importStatus}
+					className="size-4 text-muted-foreground-alt group-hover:text-muted-foreground"
+				/>
+				<p className="text-sm line-clamp-1 flex-1 text-muted-foreground group-hover:text-foreground">
+					{project.name}
+				</p>
+			</div>
+			<p className="text-muted-foreground-alt text-sm line-clamp-1 group-hover:text-muted-foreground">
 				{timeAgo}
 			</p>
-		</div>
+		</Link>
 	);
 }

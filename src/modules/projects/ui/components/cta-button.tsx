@@ -10,7 +10,7 @@ interface Props {
 export function CTAButton({ icon, label, kbdProps, onClick }: Props) {
 	return (
 		<button
-			className="bg-muted border-muted-foreground-alt border flex flex-col gap-8 p-4 md:p-8 text-start"
+			className="bg-muted border-muted-foreground-alt border flex flex-col gap-8 p-4 md:p-8 text-start group hover:border-muted-foreground animated"
 			type="button"
 			onClick={onClick}
 		>

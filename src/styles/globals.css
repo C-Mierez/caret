@@ -206,3 +206,9 @@
 		cursor: default;
 	}
 }
+
+@layer utilities {
+	.animated {
+		@apply transition-colors duration-150;
+	}
+}
