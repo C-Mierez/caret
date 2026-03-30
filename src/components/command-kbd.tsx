@@ -54,7 +54,7 @@ export default function CommandKbd({
 	return (
 		<Slot
 			type="button"
-			className="flex gap-2 items-center group"
+			className="group flex items-center gap-2"
 			onClick={onTrigger}
 		>
 			{!!kbdLabel && (

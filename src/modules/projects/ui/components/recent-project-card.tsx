@@ -21,7 +21,7 @@ export function RecentProjectCard() {
 
 	if (!data) {
 		return (
-			<div className="bg-muted border border-muted-foreground-alt grid p-4 md:p-8 place-items-center text-muted-foreground-alt">
+			<div className="grid place-items-center border border-muted-foreground-alt bg-muted p-4 text-muted-foreground-alt md:p-8">
 				No recent projects found
 			</div>
 		);
@@ -30,19 +30,19 @@ export function RecentProjectCard() {
 	return (
 		<Link
 			href={buildProjectUrl(data._id)}
-			className="bg-muted border border-muted-foreground-alt flex p-4 md:p-8 gap-3 flex-col group hover:border-muted-foreground animated"
+			className="group animated flex flex-col gap-3 border border-muted-foreground-alt bg-muted p-4 hover:border-muted-foreground md:p-8"
 		>
-			<div className="flex justify-between gap-2 items-center">
-				<div className="flex gap-2 items-center text-xl line-clamp-1">
+			<div className="flex items-center justify-between gap-2">
+				<div className="line-clamp-1 flex items-center gap-2 text-xl">
 					<ProjectImportStatusIcon
 						status={data.importStatus}
-						className="text-muted-foreground size-5"
+						className="size-5 text-muted-foreground"
 					/>
 					<span>{data.name}</span>
 				</div>
-				<ArrowRight className="text-muted-foreground group-hover:text-foreground animated" />
+				<ArrowRight className="animated text-muted-foreground group-hover:text-foreground" />
 			</div>
-			<p className="text-muted-foreground-alt group-hover:text-muted-foreground animated">
+			<p className="animated text-muted-foreground-alt group-hover:text-muted-foreground">
 				{timeAgo}
 			</p>
 		</Link>

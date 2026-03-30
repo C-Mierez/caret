@@ -21,7 +21,7 @@ export default function RecentProjectList({ renderedAt, modalProps }: Props) {
 
 	if (!data || data.length === 0) {
 		return (
-			<div className="py-3 gap-2 grid place-items-center text-muted-foreground-alt">
+			<div className="grid place-items-center gap-2 py-3 text-muted-foreground-alt">
 				Create more projects to see them here
 			</div>
 		);

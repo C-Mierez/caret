@@ -13,7 +13,7 @@ export default function RecentProjects() {
 
 	return (
 		<>
-			<section className="flex flex-col gap-2 w-full">
+			<section className="flex w-full flex-col gap-2">
 				<ProjectsSectionHeader title="Last Updated" />
 				<RecentProjectCard />
 			</section>

@@ -1,4 +1,4 @@
-import { composeServerHocs } from "../hoc/server/compose-server-hocs";
+import { composeServerHocs } from "../hoc/server/utils";
 import { withProjectsGetOwnedAll } from "../hoc/server/with-projects-getOwnedAll";
 import { withProjectsGetOwnedInfinite } from "../hoc/server/with-projects-getOwnedInfinite";
 import ProjectsView from "../modules/projects/ui/projects-view";

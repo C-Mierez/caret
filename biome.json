@@ -42,6 +42,12 @@
 					"level": "info"
 				},
 				"noChildrenProp": "off"
+			},
+			"nursery": {
+				"useSortedClasses": {
+					"fix": "safe",
+					"level": "info"
+				}
 			}
 		},
 		"domains": {

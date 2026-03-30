@@ -1,5 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { shadcn } from "@clerk/ui/themes";
+import { TooltipProvider } from "@components/ui/tooltip";
 import type React from "react";
 import ConvexClientProvider from "./convex-client-provider";
 import { ThemeProvider } from "./theme-provider";
@@ -18,7 +19,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 				}}
 			>
 				{/* Convex must be nested inside ClerkProvider */}
-				<ConvexClientProvider>{children}</ConvexClientProvider>
+				<ConvexClientProvider>
+					<TooltipProvider>{children}</TooltipProvider>
+				</ConvexClientProvider>
 			</ClerkProvider>
 		</ThemeProvider>
 	);
