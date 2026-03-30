@@ -1,6 +1,8 @@
 import type { PaginationOptions } from "convex/server";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
+import createHttpError from "http-errors";
+import type { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { withAuth } from "./lib/hoc";
 
@@ -54,6 +56,49 @@ export const getOwnedInfinite = query({
 				)
 				.order("desc")
 				.paginate(args.paginationOpts);
+		},
+	),
+});
+
+export const getOwnedById = query({
+	args: {
+		projectId: v.id("projects"),
+	},
+	handler: withAuth(async (ctx, args: { projectId: Id<"projects"> }) => {
+		const result = await ctx.db.get("projects", args.projectId);
+
+		if (!result) throw createHttpError.NotFound("Project not found");
+
+		if (result.ownerId !== ctx.identity.subject)
+			throw createHttpError.Forbidden(
+				"You do not have access to this project",
+			);
+
+		return result;
+	}),
+});
+
+export const rename = mutation({
+	args: {
+		projectId: v.id("projects"),
+		newName: v.string(),
+	},
+	handler: withAuth(
+		async (ctx, args: { projectId: Id<"projects">; newName: string }) => {
+			const project = await ctx.db.get("projects", args.projectId);
+
+			if (!project) throw createHttpError.NotFound("Project not found");
+
+			if (project.ownerId !== ctx.identity.subject)
+				throw createHttpError.Forbidden(
+					"You do not have access to this project",
+				);
+
+			// Wont throw since project is verified already
+			await ctx.db.patch("projects", args.projectId, {
+				name: args.newName,
+				updated_at: Date.now(),
+			});
 		},
 	),
 });

@@ -21,6 +21,10 @@
 	--spacing-widest: 80rem; /* Equivalent to 7xl in Tailwind */
 	--spacing-wide: 56rem; /* Equivalent to 4xl in Tailwind */
 
+	--spacing-header: 3rem; /* Header height. 3rem equivalent to h-12 */
+	--spacing-subheader: 2.5rem; /* Subheader height. 2.5rem equivalent to h-10 */
+	--spacing-sidebar: 16rem; /* Sidebar width. 16rem equivalent to w-64 */
+
 	/* ---------------------------------- Theme --------------------------------- */
 	--color-foreground: var(--foreground);
 	--color-background: var(--background);
