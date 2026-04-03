@@ -1,8 +1,8 @@
 import type { Doc } from "@convex/_generated/dataModel";
 
-export const FILE_BASE_PADDING = 40;
+export const FILE_BASE_PADDING = 16;
 
-export const FILE_INDENT_PADDING = 30;
+export const FILE_INDENT_PADDING = 12;
 
 export const FILE_GAP = 4; // equivalent to gap-1
 
