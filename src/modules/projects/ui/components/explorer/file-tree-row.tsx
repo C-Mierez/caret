@@ -19,7 +19,7 @@ export default function FileTreeRow({ file, depth }: Props) {
 			type="button"
 			onClick={() => onEntryClick(file)}
 			className={cn(
-				"flex items-end gap-1 py-1 text-start",
+				"flex w-max min-w-full items-end gap-1 py-1 pr-2 text-start",
 				!isActive && "hover:bg-muted",
 				isActive && "bg-muted",
 			)}
@@ -28,16 +28,26 @@ export default function FileTreeRow({ file, depth }: Props) {
 			}}
 		>
 			{file.type === "folder" && (
-				<TogglableChevron isOpen={expandedIds.includes(file._id)} />
+				<span className="shrink-0">
+					<TogglableChevron isOpen={expandedIds.includes(file._id)} />
+				</span>
 			)}
 
 			{file.type === "folder" ? (
-				<FolderIcon folderName={file.name} className="size-4" />
+				<FolderIcon
+					folderName={file.name}
+					className="size-4 shrink-0"
+				/>
 			) : (
-				<FileIcon fileName={file.name} autoAssign className="size-4" />
+				<FileIcon
+					fileName={file.name}
+					autoAssign
+					className="size-4 shrink-0"
+				/>
 			)}
 			<span
 				className={cn(
+					"whitespace-nowrap",
 					file.type === "file" ? "leading-3" : "leading-3.5",
 				)}
 			>

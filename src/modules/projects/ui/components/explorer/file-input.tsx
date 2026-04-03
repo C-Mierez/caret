@@ -66,15 +66,19 @@ export default function FileInput({ parentId, depth }: Props) {
 
 	return (
 		<div
-			className="flex h-6 items-center gap-1 hover:bg-muted"
+			className="flex h-6 w-max min-w-full items-center gap-1 pr-2 hover:bg-muted"
 			style={{
 				paddingLeft: getFilePadding(depth, createInputType),
 			}}
 		>
 			{createInputType === "folder" ? (
-				<FolderIcon folderName={value} className="size-4" />
+				<FolderIcon folderName={value} className="size-4 shrink-0" />
 			) : (
-				<FileIcon fileName={value} autoAssign className="size-4" />
+				<FileIcon
+					fileName={value}
+					autoAssign
+					className="size-4 shrink-0"
+				/>
 			)}
 			<Input
 				autoFocus
@@ -93,7 +97,7 @@ export default function FileInput({ parentId, depth }: Props) {
 						handleCancel();
 					}
 				}}
-				className="h-full pl-0 text-xs md:text-xs"
+				className="h-full min-w-40 pl-0 text-xs md:text-xs"
 			/>
 		</div>
 	);

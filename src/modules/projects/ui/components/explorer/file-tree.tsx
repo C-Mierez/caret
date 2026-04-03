@@ -61,9 +61,11 @@ export default function FileTreeRoot({ treeCommand, onClearSelection }: Props) {
 		<FileTreeProvider value={providerValue}>
 			<div
 				ref={containerRef}
-				className="h-[calc(100dvh-var(--spacing-subheader))] overflow-auto"
+				className="h-[calc(100dvh-var(--spacing-subheader))] overflow-x-auto overflow-y-auto"
 			>
-				<FileTreeNode path={[]} type={undefined} depth={0} />
+				<div className="w-max min-w-full">
+					<FileTreeNode path={[]} type={undefined} depth={0} />
+				</div>
 			</div>
 		</FileTreeProvider>
 	);
