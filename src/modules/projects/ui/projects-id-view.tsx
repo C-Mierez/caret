@@ -4,6 +4,7 @@ import type { Id } from "@convex/_generated/dataModel";
 import { cn } from "@lib/utils";
 import { useMemo, useState } from "react";
 import { FaGithub } from "react-icons/fa";
+import EditorBase from "./components/editor/editor-base";
 
 interface TabProps {
 	label: "Code" | "Preview";
@@ -20,7 +21,7 @@ function Tab({ label, isActive, onClick }: TabProps) {
 				onClick={onClick}
 				className={cn(
 					"flex h-full items-center gap-2 border-border border-r-2 px-6 text-sm",
-					isActive && "bg-background-alt",
+					isActive && "bg-muted-alt text-foreground",
 					!isActive && "hover:bg-muted hover:text-foreground",
 				)}
 			>
@@ -59,7 +60,7 @@ export default function ProjectsIdView({ projectId }: Props) {
 	);
 
 	return (
-		<div>
+		<div className="h-full">
 			<nav>
 				<ul className="flex h-subheader items-center border-b-2 border-b-border bg-background text-muted-foreground">
 					{tabs.map((tab) => (
@@ -79,7 +80,7 @@ export default function ProjectsIdView({ projectId }: Props) {
 					</li>
 				</ul>
 			</nav>
-			<main></main>
+			{activeTab === "Code" && <EditorBase />}
 		</div>
 	);
 }

@@ -1,4 +1,4 @@
-import { UserButton } from "@clerk/nextjs";
+import ClerkUserButton from "@components/clerk-user-button";
 import CaretSvg from "@components/svg/caret-svg";
 import {
 	Breadcrumb,
@@ -32,7 +32,7 @@ export default function ProjectsIdHeader() {
 					<BreadcrumbStatus />
 				</div>
 
-				<UserButton />
+				<ClerkUserButton />
 			</nav>
 		</header>
 	);

@@ -21,7 +21,7 @@ export function RecentProjectCard() {
 
 	if (!data) {
 		return (
-			<div className="grid place-items-center border border-muted-foreground-alt bg-muted p-4 text-muted-foreground-alt md:p-8">
+			<div className="grid place-items-center border border-muted-foreground-alt bg-muted-alt p-4 text-muted-foreground-alt md:p-8">
 				No recent projects found
 			</div>
 		);
@@ -30,7 +30,7 @@ export function RecentProjectCard() {
 	return (
 		<Link
 			href={buildProjectUrl(data._id)}
-			className="group animated flex flex-col gap-3 border border-muted-foreground-alt bg-muted p-4 hover:border-muted-foreground md:p-8"
+			className="group animated flex flex-col gap-3 border border-muted-foreground-alt bg-muted-alt p-4 hover:bg-muted md:p-8"
 		>
 			<div className="flex items-center justify-between gap-2">
 				<div className="line-clamp-1 flex items-center gap-2 text-xl">

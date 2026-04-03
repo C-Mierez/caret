@@ -35,6 +35,39 @@ export const getOwnedById = query({
 	}),
 });
 
+export const getOwnedPathToRoot = query({
+	args: {
+		fileId: v.id("files"),
+	},
+	handler: withAuth(async (ctx, args: { fileId: Id<"files"> }) => {
+		const file = await ctx.db.get("files", args.fileId);
+
+		if (!file) throw createHttpError.NotFound("File not found");
+
+		await verifyProjectOwnership(ctx, file.projectId);
+
+		const folderPathIds: Id<"files">[] = [];
+		let currentId: Id<"files"> | undefined =
+			file.type === "folder" ? file._id : file.parentId;
+
+		while (currentId) {
+			const current = await ctx.db.get("files", currentId);
+
+			if (!current || current.projectId !== file.projectId) break;
+
+			if (current.type === "folder") {
+				folderPathIds.unshift(current._id);
+			}
+
+			currentId = current.parentId;
+		}
+
+		return {
+			folderPathIds,
+		};
+	}),
+});
+
 export const getOwnedSorted = query({
 	args: {
 		projectId: v.id("projects"),
@@ -43,7 +76,10 @@ export const getOwnedSorted = query({
 	handler: withAuth(
 		async (
 			ctx,
-			args: { projectId: Id<"projects">; parentId: Id<"files"> },
+			args: {
+				projectId: Id<"projects">;
+				parentId: Id<"files"> | undefined;
+			},
 		) => {
 			await verifyProjectOwnership(ctx, args.projectId);
 
