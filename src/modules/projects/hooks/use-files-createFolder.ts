@@ -1,6 +1,7 @@
 import { api } from "@convex/_generated/api";
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import { useMutation } from "convex/react";
+import { optimisticUpdateFileCache } from "./optimistic-update-cache";
 
 export default function useFilesCreateFolder() {
 	return useMutation(api.files.createFolder).withOptimisticUpdate(
@@ -14,43 +15,16 @@ export default function useFilesCreateFolder() {
 				projectId,
 				name,
 				parentId,
-				type: "folder",
+				type: "folder" as const,
 				updatedAt: now,
 			} satisfies Doc<"files">;
 
-			const cachedQuery = localStore.getQuery(api.files.getOwnedSorted, {
+			optimisticUpdateFileCache(
+				localStore,
 				projectId,
+				newFolder,
 				parentId,
-			});
-
-			if (cachedQuery !== undefined) {
-				const sortedFiles = [...cachedQuery, newFolder].sort((a, b) => {
-					if (a.type === "folder" && b.type === "file") return -1;
-					if (a.type === "file" && b.type === "folder") return 1;
-
-					return a.name.localeCompare(b.name);
-				});
-
-				localStore.setQuery(
-					api.files.getOwnedSorted,
-					{ projectId, parentId },
-					sortedFiles,
-				);
-			}
-
-			const allFilesCachedQuery = localStore.getQuery(
-				api.files.getOwnedAll,
-				{
-					projectId,
-				},
 			);
-
-			if (allFilesCachedQuery !== undefined) {
-				localStore.setQuery(api.files.getOwnedAll, { projectId }, [
-					...allFilesCachedQuery,
-					newFolder,
-				]);
-			}
 		},
 	);
 }

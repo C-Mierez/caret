@@ -36,6 +36,7 @@ interface Props {
 }
 
 export default function ProjectsIdView({ projectId }: Props) {
+	void projectId;
 	const [activeTab, setActiveTab] = useState<TabProps["label"]>("Code");
 
 	const tabs = useMemo(

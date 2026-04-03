@@ -1,27 +1,22 @@
 "use client";
 
 import { Input } from "@components/ui/input";
-import type { Doc, Id } from "@convex/_generated/dataModel";
+import type { Id } from "@convex/_generated/dataModel";
 import useFilesCreateFile from "@modules/projects/hooks/use-files-createFile";
 import useFilesCreateFolder from "@modules/projects/hooks/use-files-createFolder";
 import { FileIcon, FolderIcon } from "@react-symbols/icons/utils";
 import { useRef, useState } from "react";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
+import { useFileTreeContext } from "./file-tree-context";
 import { getFilePadding } from "./utils";
 
 interface Props {
-	closeFileInput: () => void;
 	parentId: Id<"files"> | undefined;
-	type: Doc<"files">["type"];
 	depth: number;
 }
 
-export default function FileInput({
-	closeFileInput,
-	parentId,
-	type,
-	depth,
-}: Props) {
+export default function FileInput({ parentId, depth }: Props) {
+	const { closeCreateInput, createInputType } = useFileTreeContext();
 	const { preloadedResult: project } = useProjectsGetOwnedById();
 	const createFile = useFilesCreateFile();
 	const createFolder = useFilesCreateFolder();
@@ -35,14 +30,14 @@ export default function FileInput({
 		isHandledRef.current = true;
 
 		const name = value.trim();
-		closeFileInput();
+		closeCreateInput();
 
 		if (!name) return;
 
 		isSubmittingRef.current = true;
 
 		try {
-			if (type === "folder") {
+			if (createInputType === "folder") {
 				await createFolder({
 					name,
 					projectId: project._id,
@@ -66,17 +61,17 @@ export default function FileInput({
 		if (isHandledRef.current) return;
 
 		isHandledRef.current = true;
-		closeFileInput();
+		closeCreateInput();
 	};
 
 	return (
 		<div
 			className="flex h-6 items-center gap-1 hover:bg-muted"
 			style={{
-				paddingLeft: getFilePadding(depth, "file"),
+				paddingLeft: getFilePadding(depth, createInputType),
 			}}
 		>
-			{type === "folder" ? (
+			{createInputType === "folder" ? (
 				<FolderIcon folderName={value} className="size-4" />
 			) : (
 				<FileIcon fileName={value} autoAssign className="size-4" />
