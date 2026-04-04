@@ -3,7 +3,7 @@ import type { Doc } from "@convex/_generated/dataModel";
 import { cn } from "@lib/utils";
 import { FileIcon, FolderIcon } from "@react-symbols/icons/utils";
 import FileContextMenu from "../file-actions/file-context-menu";
-import { useFileActions } from "../file-actions/use-file-actions";
+import FolderContextMenu from "../file-actions/folder-context-menu";
 import { useFileTreeContext } from "./file-tree-context";
 import { getFilePadding } from "./utils";
 
@@ -15,11 +15,11 @@ interface Props {
 export default function FileTreeRow({ file, depth }: Props) {
 	const { activeEntryId, expandedIds, onEntryClick } = useFileTreeContext();
 	const isActive = activeEntryId === file._id;
-
-	const { items } = useFileActions(file);
+	const ContextMenuWrapper =
+		file.type === "folder" ? FolderContextMenu : FileContextMenu;
 
 	return (
-		<FileContextMenu items={items}>
+		<ContextMenuWrapper file={file}>
 			<button
 				type="button"
 				onClick={() => onEntryClick(file)}
@@ -61,6 +61,6 @@ export default function FileTreeRow({ file, depth }: Props) {
 					{file.name}
 				</span>
 			</button>
-		</FileContextMenu>
+		</ContextMenuWrapper>
 	);
 }

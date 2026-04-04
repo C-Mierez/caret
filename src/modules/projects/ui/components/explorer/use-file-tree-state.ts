@@ -1,5 +1,6 @@
 import { api } from "@convex/_generated/api";
 import type { Doc, Id } from "@convex/_generated/dataModel";
+import type { FileCreateInputType } from "@modules/projects/stores/file-workspace.types";
 import { useQuery } from "convex/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { FileTreeCommand } from "./file-tree-command";
@@ -11,6 +12,11 @@ export type FileTreeActiveEntry = Pick<
 
 interface Options {
 	treeCommand: FileTreeCommand | undefined;
+}
+
+interface OpenCreateInputOptions {
+	inputType: FileCreateInputType;
+	parentId?: Id<"files">;
 }
 
 export default function useFileTreeState({ treeCommand }: Options) {
@@ -47,30 +53,6 @@ export default function useFileTreeState({ treeCommand }: Options) {
 				return;
 			}
 
-			case "open-create-input": {
-				setCreateInputType(treeCommand.inputType);
-				setIsCreateInputOpen(true);
-
-				if (!activeEntry) {
-					setInputParentId(undefined);
-					handledCommandIdRef.current = treeCommand.id;
-					return;
-				}
-
-				if (!activePath) return;
-
-				setInputParentId(
-					activeEntry.type === "folder"
-						? activeEntry._id
-						: activeEntry.parentId,
-				);
-				setExpandedIds((prev) => [
-					...new Set([...prev, ...activePath.folderPathIds]),
-				]);
-				handledCommandIdRef.current = treeCommand.id;
-				return;
-			}
-
 			case "sync-selection-from-editor": {
 				// Placeholder: actual selection syncing will be implemented when editor events are wired.
 				handledCommandIdRef.current = treeCommand.id;
@@ -87,12 +69,55 @@ export default function useFileTreeState({ treeCommand }: Options) {
 				return treeCommand satisfies never;
 			}
 		}
-	}, [treeCommand, activeEntry, activePath]);
+	}, [treeCommand]);
 
 	const closeCreateInput = useCallback(() => {
 		setIsCreateInputOpen(false);
 		setInputParentId(undefined);
 	}, []);
+
+	const openCreateInput = useCallback(
+		({ inputType, parentId }: OpenCreateInputOptions) => {
+			setCreateInputType(inputType);
+			setIsCreateInputOpen(true);
+
+			if (parentId) {
+				setInputParentId(parentId);
+				setExpandedIds((prev) =>
+					prev.includes(parentId) ? prev : [...prev, parentId],
+				);
+				return;
+			}
+
+			if (!activeEntry) {
+				setInputParentId(undefined);
+				return;
+			}
+
+			const resolvedParentId =
+				activeEntry.type === "folder"
+					? activeEntry._id
+					: activeEntry.parentId;
+
+			setInputParentId(resolvedParentId);
+
+			if (!activePath) {
+				if (resolvedParentId) {
+					setExpandedIds((prev) =>
+						prev.includes(resolvedParentId)
+							? prev
+							: [...prev, resolvedParentId],
+					);
+				}
+				return;
+			}
+
+			setExpandedIds((prev) => [
+				...new Set([...prev, ...activePath.folderPathIds]),
+			]);
+		},
+		[activeEntry, activePath],
+	);
 
 	const closeRenameInput = useCallback(() => {
 		setRenameInputId(undefined);
@@ -130,6 +155,7 @@ export default function useFileTreeState({ treeCommand }: Options) {
 		activeEntryId,
 		isCreateInputOpen,
 		createInputType,
+		openCreateInput,
 		closeCreateInput,
 		inputParentId,
 		renameInputId,

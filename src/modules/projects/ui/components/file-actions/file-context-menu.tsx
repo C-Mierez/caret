@@ -6,7 +6,8 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@components/ui/context-menu";
-import type { FileAction } from "./use-file-actions";
+import type { FileActionTarget } from "@modules/projects/stores/file-workspace.types";
+import { type FileAction, useFileActions } from "./use-file-actions";
 
 export interface FileContextMenuItem {
 	key: FileAction;
@@ -17,20 +18,18 @@ export interface FileContextMenuItem {
 
 interface Props {
 	children: React.ReactNode;
-	items: FileContextMenuItem[];
+	file: FileActionTarget;
 }
 
-export default function FileContextMenu({ children, items }: Props) {
+export default function FileContextMenu({ children, file }: Props) {
+	const { items } = useFileActions(file);
+
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger>{children}</ContextMenuTrigger>
 			<ContextMenuContent>
 				{items.map((item) => (
-					<ContextMenuItem
-						key={item.key}
-						disabled={item.disabled}
-						onClick={item.onSelect}
-					>
+					<ContextMenuItem key={item.key} onClick={item.onSelect}>
 						{item.label}
 					</ContextMenuItem>
 				))}

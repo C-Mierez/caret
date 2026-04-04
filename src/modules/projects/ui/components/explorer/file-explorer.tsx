@@ -2,6 +2,7 @@
 
 import SimpleTooltip from "@components/simple-tooltip";
 import TogglableChevron from "@components/togglable-chevron";
+import { useFileWorkspaceStore } from "@modules/projects/stores/use-file-workspace-store";
 import { CopyMinusIcon, FilePlusIcon, FolderPlusIcon } from "lucide-react";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 import FileTreeRoot from "./file-tree";
@@ -9,11 +10,13 @@ import useFileExplorerState from "./use-file-explorer-state";
 
 export default function FileExplorer() {
 	const { preloadedResult: project } = useProjectsGetOwnedById();
+	const requestCreateInput = useFileWorkspaceStore(
+		(state) => state.requestCreateInput,
+	);
 	const {
 		isFileTreeOpen,
 		toggleFileTree,
 		treeCommand,
-		openCreateInput,
 		collapseAll,
 		clearSelection,
 	} = useFileExplorerState();
@@ -38,7 +41,7 @@ export default function FileExplorer() {
 						label={{
 							text: "New File...",
 						}}
-						onClick={() => openCreateInput("file")}
+						onClick={() => requestCreateInput("file")}
 					>
 						<div className="py-2 pr-1 pl-2 hover:text-foreground">
 							<FilePlusIcon className="size-3.5" />
@@ -49,7 +52,7 @@ export default function FileExplorer() {
 						label={{
 							text: "New Folder...",
 						}}
-						onClick={() => openCreateInput("folder")}
+						onClick={() => requestCreateInput("folder")}
 					>
 						<div className="py-2 pr-1 pl-1 hover:text-foreground">
 							<FolderPlusIcon className="size-3.5" />

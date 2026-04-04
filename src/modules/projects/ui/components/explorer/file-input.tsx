@@ -1,5 +1,6 @@
 "use client";
 
+import TogglableChevron from "@components/togglable-chevron";
 import { Input } from "@components/ui/input";
 import type { Id } from "@convex/_generated/dataModel";
 import useFilesCreateFile from "@modules/projects/hooks/use-files-createFile";
@@ -72,7 +73,13 @@ export default function FileInput({ parentId, depth }: Props) {
 			}}
 		>
 			{createInputType === "folder" ? (
-				<FolderIcon folderName={value} className="size-4 shrink-0" />
+				<>
+					<TogglableChevron isOpen={false} />
+					<FolderIcon
+						folderName={value}
+						className="size-4 shrink-0"
+					/>
+				</>
 			) : (
 				<FileIcon
 					fileName={value}

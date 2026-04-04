@@ -1,3 +1,4 @@
+import ConfirmationModal from "@components/modals/confirmation-modal";
 import { api } from "@convex/_generated/api";
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import { useQuery } from "convex/react";
@@ -24,6 +25,7 @@ export default function FileTreeRoot({ treeCommand, onClearSelection }: Props) {
 		activeEntryId,
 		isCreateInputOpen,
 		createInputType,
+		openCreateInput,
 		closeCreateInput,
 		inputParentId,
 		renameInputId,
@@ -38,7 +40,8 @@ export default function FileTreeRoot({ treeCommand, onClearSelection }: Props) {
 		onClearSelection,
 	});
 
-	useFileTreeWorkspaceState({
+	const deleteConfirmationModal = useFileTreeWorkspaceState({
+		openCreateInput,
 		openRenameInput,
 	});
 
@@ -82,6 +85,11 @@ export default function FileTreeRoot({ treeCommand, onClearSelection }: Props) {
 					<FileTreeNode path={[]} type={undefined} depth={0} />
 				</div>
 			</div>
+
+			<ConfirmationModal
+				type="destructive"
+				{...deleteConfirmationModal}
+			/>
 		</FileTreeProvider>
 	);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import type { Doc, Id } from "@convex/_generated/dataModel";
+import type { Id } from "@convex/_generated/dataModel";
 import useToggle from "@hooks/use-toggle";
 import { useRef, useState } from "react";
 import type { FileTreeCommand } from "./file-tree-command";
@@ -15,15 +15,6 @@ export default function useFileExplorerState() {
 	const getNextCommandId = () => {
 		nextCommandIdRef.current += 1;
 		return nextCommandIdRef.current;
-	};
-
-	const openCreateInput = (type: Doc<"files">["type"]) => {
-		const nextId = getNextCommandId();
-		setTreeCommand({
-			id: nextId,
-			type: "open-create-input",
-			inputType: type,
-		});
 	};
 
 	const collapseAll = () => {
@@ -55,7 +46,6 @@ export default function useFileExplorerState() {
 		isFileTreeOpen,
 		treeCommand,
 		toggleFileTree,
-		openCreateInput,
 		collapseAll,
 		syncSelectionFromEditor,
 		clearSelection,
