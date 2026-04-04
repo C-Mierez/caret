@@ -20,6 +20,7 @@ export default function useFileTreeState({ treeCommand }: Options) {
 	const [createInputType, setCreateInputType] =
 		useState<Doc<"files">["type"]>("file");
 	const [inputParentId, setInputParentId] = useState<Id<"files">>();
+	const [renameInputId, setRenameInputId] = useState<Id<"files">>();
 	const handledCommandIdRef = useRef(0);
 	const activeEntryId = activeEntry?._id;
 
@@ -93,6 +94,14 @@ export default function useFileTreeState({ treeCommand }: Options) {
 		setInputParentId(undefined);
 	}, []);
 
+	const closeRenameInput = useCallback(() => {
+		setRenameInputId(undefined);
+	}, []);
+
+	const openRenameInput = useCallback((fileId: Id<"files">) => {
+		setRenameInputId(fileId);
+	}, []);
+
 	const onEntryClick = useCallback(
 		(file: FileTreeActiveEntry) => {
 			if (activeEntry?._id === file._id) {
@@ -123,6 +132,9 @@ export default function useFileTreeState({ treeCommand }: Options) {
 		createInputType,
 		closeCreateInput,
 		inputParentId,
+		renameInputId,
+		closeRenameInput,
+		openRenameInput,
 		onEntryClick,
 	};
 }

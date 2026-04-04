@@ -3,17 +3,15 @@
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import { createContext, useContext } from "react";
 
-/**
- * Shared context for the file tree recursion.
- * Exposes: project ID, input state/type, expansion state, active selection, and tree actions.
- * Prevents prop-drilling through nested file tree nodes.
- */
 export interface FileTreeContextValue {
 	projectId: Id<"projects">;
 	isCreateInputOpen: boolean;
 	closeCreateInput: () => void;
 	createInputType: Doc<"files">["type"];
 	inputParentId: Id<"files"> | undefined;
+	renameInputId: Id<"files"> | undefined;
+	closeRenameInput: () => void;
+	openRenameInput: (fileId: Id<"files">) => void;
 	expandedIds: Id<"files">[];
 	activeEntryId: Id<"files"> | undefined;
 	onEntryClick: (

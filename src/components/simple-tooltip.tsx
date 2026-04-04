@@ -4,7 +4,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface Props extends TooltipPrimitive.Trigger.Props {
 	children: React.ReactNode;
-
 	label?: {
 		text: string;
 		className?: string;

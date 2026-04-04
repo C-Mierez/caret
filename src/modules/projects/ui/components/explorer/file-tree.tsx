@@ -4,11 +4,13 @@ import { useQuery } from "convex/react";
 import { Fragment, useMemo } from "react";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 import FileInput from "./file-input";
+import FileRenameInput from "./file-rename-input";
 import type { FileTreeCommand } from "./file-tree-command";
 import { FileTreeProvider, useFileTreeContext } from "./file-tree-context";
 import FileTreeRow from "./file-tree-row";
 import useFileTreeInteractions from "./use-file-tree-interactions";
 import useFileTreeState from "./use-file-tree-state";
+import useFileTreeWorkspaceState from "./use-file-tree-workspace-state";
 
 interface Props {
 	treeCommand: FileTreeCommand | undefined;
@@ -24,6 +26,9 @@ export default function FileTreeRoot({ treeCommand, onClearSelection }: Props) {
 		createInputType,
 		closeCreateInput,
 		inputParentId,
+		renameInputId,
+		closeRenameInput,
+		openRenameInput,
 		onEntryClick,
 	} = useFileTreeState({
 		treeCommand,
@@ -31,6 +36,10 @@ export default function FileTreeRoot({ treeCommand, onClearSelection }: Props) {
 	const { containerRef } = useFileTreeInteractions({
 		activeEntryId,
 		onClearSelection,
+	});
+
+	useFileTreeWorkspaceState({
+		openRenameInput,
 	});
 
 	// Avoid potential rerenders of the entire tree
@@ -41,6 +50,9 @@ export default function FileTreeRoot({ treeCommand, onClearSelection }: Props) {
 			closeCreateInput,
 			createInputType,
 			inputParentId,
+			renameInputId,
+			closeRenameInput,
+			openRenameInput,
 			expandedIds,
 			activeEntryId,
 			onEntryClick,
@@ -51,6 +63,9 @@ export default function FileTreeRoot({ treeCommand, onClearSelection }: Props) {
 			closeCreateInput,
 			createInputType,
 			inputParentId,
+			renameInputId,
+			closeRenameInput,
+			openRenameInput,
 			expandedIds,
 			activeEntryId,
 			onEntryClick,
@@ -78,8 +93,13 @@ interface FileTreeNodeProps {
 }
 
 function FileTreeNode({ path, type, depth }: FileTreeNodeProps) {
-	const { projectId, isCreateInputOpen, inputParentId, expandedIds } =
-		useFileTreeContext();
+	const {
+		projectId,
+		isCreateInputOpen,
+		inputParentId,
+		expandedIds,
+		renameInputId,
+	} = useFileTreeContext();
 	const currentParentId = path[path.length - 1] as Id<"files"> | undefined;
 	const shouldQueryChildren =
 		currentParentId === undefined || expandedIds.includes(currentParentId);
@@ -105,9 +125,20 @@ function FileTreeNode({ path, type, depth }: FileTreeNodeProps) {
 				)}
 
 			{data.map((file) => {
+				const isRenaming = renameInputId === file._id;
+
 				return (
 					<Fragment key={file._id}>
-						<FileTreeRow file={file} depth={depth} />
+						{isRenaming ? (
+							<FileRenameInput
+								fileId={file._id}
+								currentName={file.name}
+								type={file.type}
+								depth={depth}
+							/>
+						) : (
+							<FileTreeRow file={file} depth={depth} />
+						)}
 
 						{file.type === "folder" && (
 							<FileTreeNode
