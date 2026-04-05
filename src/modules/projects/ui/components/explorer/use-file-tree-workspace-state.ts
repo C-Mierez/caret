@@ -7,7 +7,7 @@ import type {
 	FileCreateInputType,
 	FileWorkspaceRequest,
 } from "@modules/projects/stores/file-workspace.types";
-import { useFileWorkspaceStore } from "@modules/projects/stores/use-file-workspace-store";
+import { useFileWorkspaceRequest } from "@modules/projects/stores/use-file-workspace-request";
 import { useCallback, useState } from "react";
 
 interface Options {
@@ -29,7 +29,7 @@ export default function useFileTreeWorkspaceState({
 	openRenameInput,
 	openCreateInput,
 }: Options): FileTreeWorkspaceState {
-	const request = useFileWorkspaceStore((state) => state.request);
+	const request = useFileWorkspaceRequest((state) => state.request);
 
 	const removeFile = useFilesRemove();
 

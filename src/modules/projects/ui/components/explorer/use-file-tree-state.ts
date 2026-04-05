@@ -3,7 +3,7 @@ import type { Doc, Id } from "@convex/_generated/dataModel";
 import useRequestConsumer from "@hooks/use-request-consumer";
 import type { FileExplorerRequest } from "@modules/projects/stores/file-explorer.types";
 import type { FileCreateInputType } from "@modules/projects/stores/file-workspace.types";
-import { useFileExplorerStore } from "@modules/projects/stores/use-file-explorer-store";
+import { useFileExplorerRequest } from "@modules/projects/stores/use-file-explorer-request";
 import { useQuery } from "convex/react";
 import { useCallback, useState } from "react";
 
@@ -25,7 +25,7 @@ export default function useFileTreeState() {
 		useState<Doc<"files">["type"]>("file");
 	const [inputParentId, setInputParentId] = useState<Id<"files">>();
 	const [renameInputId, setRenameInputId] = useState<Id<"files">>();
-	const request = useFileExplorerStore((state) => state.request);
+	const request = useFileExplorerRequest((state) => state.request);
 	const activeEntryId = activeEntry?._id;
 
 	const activePath = useQuery(

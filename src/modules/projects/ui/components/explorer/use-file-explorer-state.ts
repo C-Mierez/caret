@@ -1,17 +1,17 @@
 "use client";
 
 import useToggle from "@hooks/use-toggle";
-import { useFileExplorerStore } from "@modules/projects/stores/use-file-explorer-store";
+import { useFileExplorerRequest } from "@modules/projects/stores/use-file-explorer-request";
 
 export default function useFileExplorerState() {
 	const { isOpen: isFileTreeOpen, toggle: toggleFileTree } = useToggle(true);
-	const requestCollapseAll = useFileExplorerStore(
+	const requestCollapseAll = useFileExplorerRequest(
 		(state) => state.requestCollapseAll,
 	);
-	const requestSyncSelection = useFileExplorerStore(
+	const requestSyncSelection = useFileExplorerRequest(
 		(state) => state.requestSyncSelection,
 	);
-	const requestClearSelection = useFileExplorerStore(
+	const requestClearSelection = useFileExplorerRequest(
 		(state) => state.requestClearSelection,
 	);
 
