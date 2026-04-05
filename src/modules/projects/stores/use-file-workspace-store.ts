@@ -2,21 +2,13 @@ import type { Id } from "@convex/_generated/dataModel";
 import { create } from "zustand";
 import type {
 	FileActionTarget,
-	FileCreateInputRequest,
 	FileCreateInputType,
-	FileDeleteRequest,
-	FileDuplicateRequest,
-	FileOpenRequest,
-	FileRenameRequest,
+	FileWorkspaceRequest,
 } from "./file-workspace.types";
 
 export interface FileWorkspaceStore {
 	nextRequestId: number;
-	openRequest: FileOpenRequest | undefined;
-	createInputRequest: FileCreateInputRequest | undefined;
-	renameRequest: FileRenameRequest | undefined;
-	deleteRequest: FileDeleteRequest | undefined;
-	duplicateRequest: FileDuplicateRequest | undefined;
+	request: FileWorkspaceRequest | undefined;
 	requestOpenFile: (fileId: Id<"files">) => void;
 	requestCreateInput: (
 		inputType: FileCreateInputType,
@@ -29,19 +21,16 @@ export interface FileWorkspaceStore {
 
 export const useFileWorkspaceStore = create<FileWorkspaceStore>((set) => ({
 	nextRequestId: 0,
-	openRequest: undefined,
-	createInputRequest: undefined,
-	renameRequest: undefined,
-	deleteRequest: undefined,
-	duplicateRequest: undefined,
+	request: undefined,
 	requestOpenFile: (fileId) => {
 		set((state) => {
 			const nextRequestId = state.nextRequestId + 1;
 
 			return {
 				nextRequestId,
-				openRequest: {
+				request: {
 					id: nextRequestId,
+					type: "open",
 					fileId,
 				},
 			};
@@ -53,8 +42,9 @@ export const useFileWorkspaceStore = create<FileWorkspaceStore>((set) => ({
 
 			return {
 				nextRequestId,
-				createInputRequest: {
+				request: {
 					id: nextRequestId,
+					type: "create-input",
 					inputType,
 					parentId,
 				},
@@ -67,8 +57,9 @@ export const useFileWorkspaceStore = create<FileWorkspaceStore>((set) => ({
 
 			return {
 				nextRequestId,
-				renameRequest: {
+				request: {
 					id: nextRequestId,
+					type: "rename",
 					fileId,
 				},
 			};
@@ -80,8 +71,9 @@ export const useFileWorkspaceStore = create<FileWorkspaceStore>((set) => ({
 
 			return {
 				nextRequestId,
-				deleteRequest: {
+				request: {
 					id: nextRequestId,
+					type: "delete",
 					file,
 				},
 			};
@@ -93,8 +85,9 @@ export const useFileWorkspaceStore = create<FileWorkspaceStore>((set) => ({
 
 			return {
 				nextRequestId,
-				duplicateRequest: {
+				request: {
 					id: nextRequestId,
+					type: "duplicate",
 					fileId,
 				},
 			};

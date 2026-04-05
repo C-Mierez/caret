@@ -16,9 +16,8 @@ export default function FileExplorer() {
 	const {
 		isFileTreeOpen,
 		toggleFileTree,
-		treeCommand,
-		collapseAll,
-		clearSelection,
+		requestCollapseAll,
+		requestClearSelection,
 	} = useFileExplorerState();
 
 	return (
@@ -63,7 +62,7 @@ export default function FileExplorer() {
 						label={{
 							text: "Collapse Folders",
 						}}
-						onClick={collapseAll}
+						onClick={requestCollapseAll}
 					>
 						<div className="py-2 pr-2 pl-1 hover:text-foreground">
 							<CopyMinusIcon className="size-3.5" />
@@ -73,10 +72,7 @@ export default function FileExplorer() {
 			</header>
 
 			{isFileTreeOpen && (
-				<FileTreeRoot
-					treeCommand={treeCommand}
-					onClearSelection={clearSelection}
-				/>
+				<FileTreeRoot requestClearSelection={requestClearSelection} />
 			)}
 		</section>
 	);

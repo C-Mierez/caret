@@ -5,9 +5,10 @@ import useFilesRemove from "@modules/projects/hooks/use-files-remove";
 import type {
 	FileActionTarget,
 	FileCreateInputType,
+	FileWorkspaceRequest,
 } from "@modules/projects/stores/file-workspace.types";
 import { useFileWorkspaceStore } from "@modules/projects/stores/use-file-workspace-store";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 interface Options {
 	openRenameInput: (fileId: Id<"files">) => void;
@@ -28,11 +29,7 @@ export default function useFileTreeWorkspaceState({
 	openRenameInput,
 	openCreateInput,
 }: Options): FileTreeWorkspaceState {
-	const createInputRequest = useFileWorkspaceStore(
-		(state) => state.createInputRequest,
-	);
-	const renameRequest = useFileWorkspaceStore((state) => state.renameRequest);
-	const deleteRequest = useFileWorkspaceStore((state) => state.deleteRequest);
+	const request = useFileWorkspaceStore((state) => state.request);
 
 	const removeFile = useFilesRemove();
 
@@ -45,21 +42,45 @@ export default function useFileTreeWorkspaceState({
 		},
 	});
 
-	useRequestConsumer(createInputRequest, (request) => {
-		openCreateInput({
-			inputType: request.inputType,
-			parentId: request.parentId,
-		});
-	});
+	const handleRequest = useCallback(
+		(nextRequest: FileWorkspaceRequest) => {
+			switch (nextRequest.type) {
+				case "create-input": {
+					openCreateInput({
+						inputType: nextRequest.inputType,
+						parentId: nextRequest.parentId,
+					});
+					return;
+				}
 
-	useRequestConsumer(renameRequest, (request) => {
-		openRenameInput(request.fileId);
-	});
+				case "rename": {
+					openRenameInput(nextRequest.fileId);
+					return;
+				}
 
-	useRequestConsumer(deleteRequest, (request) => {
-		setDeleteTargetFile(request.file);
-		deleteConfirmationModal.openModal();
-	});
+				case "delete": {
+					setDeleteTargetFile(nextRequest.file);
+					deleteConfirmationModal.openModal();
+					return;
+				}
+
+				case "open": {
+					return;
+				}
+
+				case "duplicate": {
+					return;
+				}
+
+				default: {
+					return nextRequest satisfies never;
+				}
+			}
+		},
+		[deleteConfirmationModal, openCreateInput, openRenameInput],
+	);
+
+	useRequestConsumer(request, handleRequest);
 
 	const deleteTargetLabel = deleteTargetFile?.type ?? "file";
 	const deleteTargetName = deleteTargetFile?.name ?? "this item";

@@ -6,7 +6,6 @@ import { Fragment, useMemo } from "react";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 import FileInput from "./file-input";
 import FileRenameInput from "./file-rename-input";
-import type { FileTreeCommand } from "./file-tree-command";
 import { FileTreeProvider, useFileTreeContext } from "./file-tree-context";
 import FileTreeRow from "./file-tree-row";
 import useFileTreeInteractions from "./use-file-tree-interactions";
@@ -14,11 +13,10 @@ import useFileTreeState from "./use-file-tree-state";
 import useFileTreeWorkspaceState from "./use-file-tree-workspace-state";
 
 interface Props {
-	treeCommand: FileTreeCommand | undefined;
-	onClearSelection: () => void;
+	requestClearSelection: () => void;
 }
 
-export default function FileTreeRoot({ treeCommand, onClearSelection }: Props) {
+export default function FileTreeRoot({ requestClearSelection }: Props) {
 	const { preloadedResult: project } = useProjectsGetOwnedById();
 	const {
 		expandedIds,
@@ -32,12 +30,10 @@ export default function FileTreeRoot({ treeCommand, onClearSelection }: Props) {
 		closeRenameInput,
 		openRenameInput,
 		onEntryClick,
-	} = useFileTreeState({
-		treeCommand,
-	});
+	} = useFileTreeState();
 	const { containerRef } = useFileTreeInteractions({
 		activeEntryId,
-		onClearSelection,
+		requestClearSelection,
 	});
 
 	const deleteConfirmationModal = useFileTreeWorkspaceState({

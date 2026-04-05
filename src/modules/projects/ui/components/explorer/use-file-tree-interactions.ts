@@ -3,12 +3,12 @@ import { useEffect, useRef } from "react";
 
 interface Options {
 	activeEntryId: Id<"files"> | undefined;
-	onClearSelection: () => void;
+	requestClearSelection: () => void;
 }
 
 export default function useFileTreeInteractions({
 	activeEntryId,
-	onClearSelection,
+	requestClearSelection,
 }: Options) {
 	const containerRef = useRef<HTMLDivElement>(null);
 
@@ -18,7 +18,7 @@ export default function useFileTreeInteractions({
 
 		const onContainerClick = (event: MouseEvent) => {
 			if (event.target === container && activeEntryId) {
-				onClearSelection();
+				requestClearSelection();
 			}
 		};
 
@@ -28,7 +28,7 @@ export default function useFileTreeInteractions({
 			const focusedElement = document.activeElement;
 			if (focusedElement && container.contains(focusedElement)) {
 				event.preventDefault();
-				onClearSelection();
+				requestClearSelection();
 			}
 		};
 
@@ -39,7 +39,7 @@ export default function useFileTreeInteractions({
 			container.removeEventListener("click", onContainerClick);
 			window.removeEventListener("keydown", onWindowKeyDown);
 		};
-	}, [activeEntryId, onClearSelection]);
+	}, [activeEntryId, requestClearSelection]);
 
 	return {
 		containerRef,

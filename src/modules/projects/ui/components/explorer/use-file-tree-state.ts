@@ -1,25 +1,23 @@
 import { api } from "@convex/_generated/api";
 import type { Doc, Id } from "@convex/_generated/dataModel";
+import useRequestConsumer from "@hooks/use-request-consumer";
+import type { FileExplorerRequest } from "@modules/projects/stores/file-explorer.types";
 import type { FileCreateInputType } from "@modules/projects/stores/file-workspace.types";
+import { useFileExplorerStore } from "@modules/projects/stores/use-file-explorer-store";
 import { useQuery } from "convex/react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { FileTreeCommand } from "./file-tree-command";
+import { useCallback, useState } from "react";
 
 export type FileTreeActiveEntry = Pick<
 	Doc<"files">,
 	"_id" | "type" | "parentId"
 >;
 
-interface Options {
-	treeCommand: FileTreeCommand | undefined;
-}
-
 interface OpenCreateInputOptions {
 	inputType: FileCreateInputType;
 	parentId?: Id<"files">;
 }
 
-export default function useFileTreeState({ treeCommand }: Options) {
+export default function useFileTreeState() {
 	const [expandedIds, setExpandedIds] = useState<Id<"files">[]>([]);
 	const [activeEntry, setActiveEntry] = useState<FileTreeActiveEntry>();
 	const [isCreateInputOpen, setIsCreateInputOpen] = useState(false);
@@ -27,7 +25,7 @@ export default function useFileTreeState({ treeCommand }: Options) {
 		useState<Doc<"files">["type"]>("file");
 	const [inputParentId, setInputParentId] = useState<Id<"files">>();
 	const [renameInputId, setRenameInputId] = useState<Id<"files">>();
-	const handledCommandIdRef = useRef(0);
+	const request = useFileExplorerStore((state) => state.request);
 	const activeEntryId = activeEntry?._id;
 
 	const activePath = useQuery(
@@ -39,37 +37,32 @@ export default function useFileTreeState({ treeCommand }: Options) {
 			: "skip",
 	);
 
-	useEffect(() => {
-		if (!treeCommand) return;
-
-		if (handledCommandIdRef.current === treeCommand.id) return;
-
-		switch (treeCommand.type) {
+	const handleRequest = useCallback((nextRequest: FileExplorerRequest) => {
+		switch (nextRequest.type) {
 			case "collapse-all": {
 				setExpandedIds([]);
 				setIsCreateInputOpen(false);
 				setInputParentId(undefined);
-				handledCommandIdRef.current = treeCommand.id;
 				return;
 			}
 
 			case "sync-selection-from-editor": {
 				// Placeholder: actual selection syncing will be implemented when editor events are wired.
-				handledCommandIdRef.current = treeCommand.id;
 				return;
 			}
 
 			case "clear-selection": {
 				setActiveEntry(undefined);
-				handledCommandIdRef.current = treeCommand.id;
 				return;
 			}
 
 			default: {
-				return treeCommand satisfies never;
+				return nextRequest satisfies never;
 			}
 		}
-	}, [treeCommand]);
+	}, []);
+
+	useRequestConsumer(request, handleRequest);
 
 	const closeCreateInput = useCallback(() => {
 		setIsCreateInputOpen(false);

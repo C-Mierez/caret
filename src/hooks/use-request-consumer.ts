@@ -8,10 +8,15 @@ export default function useRequestConsumer<T extends RequestWithId>(
 	request: T | undefined,
 	onRequest: (request: T) => void,
 ) {
-	const handledRequestIdRef = useRef(0);
+	const handledRequestIdRef = useRef<number | undefined>(undefined);
 
 	useEffect(() => {
 		if (!request) return;
+
+		if (handledRequestIdRef.current === undefined) {
+			handledRequestIdRef.current = request.id;
+			return;
+		}
 
 		if (request.id === handledRequestIdRef.current) {
 			return;
