@@ -61,7 +61,7 @@ export default function ProjectsIdView({ projectId }: Props) {
 	);
 
 	return (
-		<div className="h-full">
+		<div className="flex h-full min-h-0 flex-col">
 			<nav>
 				<ul className="flex h-subheader items-center border-b-2 border-b-border bg-background text-muted-foreground">
 					{tabs.map((tab) => (
@@ -81,7 +81,11 @@ export default function ProjectsIdView({ projectId }: Props) {
 					</li>
 				</ul>
 			</nav>
-			{activeTab === "Code" && <EditorBase />}
+			{activeTab === "Code" && (
+				<div className="min-h-0 flex-1">
+					<EditorBase />
+				</div>
+			)}
 		</div>
 	);
 }

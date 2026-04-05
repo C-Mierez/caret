@@ -21,11 +21,11 @@ export default function SimpleTooltip({
 			<TooltipTrigger type={type} {...props}>
 				{children}
 			</TooltipTrigger>
-			<TooltipContent>
-				{label?.text && (
+			{label?.text && (
+				<TooltipContent>
 					<span className={label?.className}>{label?.text}</span>
-				)}
-			</TooltipContent>
+				</TooltipContent>
+			)}
 		</Tooltip>
 	);
 }

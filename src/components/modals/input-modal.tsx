@@ -12,7 +12,7 @@ import type { ModalProps } from "@hooks/use-modal";
 import useModalHandler from "@hooks/use-modal-handler";
 import { useForm } from "@tanstack/react-form";
 import { useEffect } from "react";
-import z from "zod";
+import { z } from "zod";
 import ResponsiveModal from "./responsive-modal";
 
 interface Props extends ModalProps {

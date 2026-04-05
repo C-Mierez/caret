@@ -277,6 +277,9 @@ export const remove = mutation({
 
 			//? Check if this is potentially a risky approach for stack overflow threat? I'd image it's unlikely due to the domain - folders are probably not too deep lol
 			const deleteFileAndChildren = async (fileId: Id<"files">) => {
+				const currentFile = await ctx.db.get(fileId);
+				if (!currentFile) return;
+
 				const children = await ctx.db
 					.query("files")
 					.withIndex("by_parent", (q) => q.eq("parentId", fileId))
@@ -287,9 +290,10 @@ export const remove = mutation({
 				);
 
 				// Delete storage if exists
-				if (file.storageId) await ctx.storage.delete(file.storageId);
+				if (currentFile.storageId)
+					await ctx.storage.delete(currentFile.storageId);
 				// Delete file
-				await ctx.db.delete("files", fileId);
+				await ctx.db.delete(fileId);
 			};
 
 			await deleteFileAndChildren(args.fileId);

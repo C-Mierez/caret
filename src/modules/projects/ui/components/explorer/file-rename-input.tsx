@@ -101,7 +101,11 @@ export default function FileRenameInput({
 					// Select all text except extension
 					if (type === "file" && currentName.includes(".")) {
 						const lastDot = currentName.lastIndexOf(".");
-						e.target.setSelectionRange(0, lastDot);
+						if (lastDot > 0) {
+							e.target.setSelectionRange(0, lastDot);
+						} else {
+							e.target.select();
+						}
 					} else {
 						e.target.select();
 					}
