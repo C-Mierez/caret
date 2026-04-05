@@ -1,27 +1,31 @@
+import type { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
 import type React from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-interface Props {
+interface Props extends TooltipPrimitive.Trigger.Props {
 	children: React.ReactNode;
-	content?: {
-		children?: React.ReactNode;
-		contentProps?: React.ComponentProps<typeof TooltipContent>;
-	};
 	label?: {
 		text: string;
 		className?: string;
 	};
 }
 
-export default function SimpleTooltip({ children, content, label }: Props) {
+export default function SimpleTooltip({
+	children,
+	type = "button",
+	label,
+	...props
+}: Props) {
 	return (
 		<Tooltip>
-			<TooltipTrigger>{children}</TooltipTrigger>
-			<TooltipContent {...content?.contentProps}>
-				{content?.children || (
+			<TooltipTrigger type={type} {...props}>
+				{children}
+			</TooltipTrigger>
+			{label?.text && (
+				<TooltipContent>
 					<span className={label?.className}>{label?.text}</span>
-				)}
-			</TooltipContent>
+				</TooltipContent>
+			)}
 		</Tooltip>
 	);
 }

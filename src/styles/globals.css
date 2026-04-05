@@ -39,6 +39,7 @@
 	--color-muted-foreground: var(--muted-foreground);
 	--color-muted-foreground-alt: var(--muted-foreground-alt);
 	--color-muted: var(--muted);
+	--color-muted-alt: var(--muted-alt);
 
 	--color-accent-foreground: var(--accent-foreground);
 	--color-accent: var(--accent);
@@ -150,7 +151,8 @@
 	--secondary: var(--color-accent-500);
 	--secondary-foreground: var(--color-main-950);
 
-	--muted: var(--color-main-800);
+	--muted: var(--color-main-700);
+	--muted-alt: var(--color-main-800);
 	--muted-foreground: var(--color-main-400);
 	--muted-foreground-alt: var(--color-main-600);
 

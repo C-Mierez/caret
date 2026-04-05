@@ -1,6 +1,7 @@
 "use client";
 
 import { BreadcrumbPage } from "@components/ui/breadcrumb";
+import { Input } from "@components/ui/input";
 import useProjectRename from "@modules/projects/hooks/use-project-rename";
 import { useState } from "react";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
@@ -46,8 +47,7 @@ export default function BreadcrumbEditable() {
 			}}
 		>
 			{isEditing ? (
-				<input
-					// biome-ignore lint/a11y/noAutofocus: Improves UX
+				<Input
 					autoFocus
 					type="text"
 					value={editedName}
