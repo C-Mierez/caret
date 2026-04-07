@@ -30,6 +30,7 @@ export default function FileTreeRoot({ requestClearSelection }: Props) {
 		closeRenameInput,
 		openRenameInput,
 		onEntryClick,
+		onEntryDoubleClick,
 	} = useFileTreeState();
 	const { containerRef } = useFileTreeInteractions({
 		activeEntryId,
@@ -55,6 +56,7 @@ export default function FileTreeRoot({ requestClearSelection }: Props) {
 			expandedIds,
 			activeEntryId,
 			onEntryClick,
+			onEntryDoubleClick,
 		}),
 		[
 			project._id,
@@ -68,6 +70,7 @@ export default function FileTreeRoot({ requestClearSelection }: Props) {
 			expandedIds,
 			activeEntryId,
 			onEntryClick,
+			onEntryDoubleClick,
 		],
 	);
 

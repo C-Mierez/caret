@@ -3,9 +3,11 @@ import type { Doc, Id } from "@convex/_generated/dataModel";
 import useRequestConsumer from "@hooks/use-request-consumer";
 import type { FileExplorerRequest } from "@modules/projects/stores/file-explorer.types";
 import type { FileCreateInputType } from "@modules/projects/stores/file-workspace.types";
+import { useFileEditorStore } from "@modules/projects/stores/use-file-editor-store";
 import { useFileExplorerRequest } from "@modules/projects/stores/use-file-explorer-request";
 import { useQuery } from "convex/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 
 export type FileTreeActiveEntry = Pick<
 	Doc<"files">,
@@ -25,8 +27,13 @@ export default function useFileTreeState() {
 		useState<Doc<"files">["type"]>("file");
 	const [inputParentId, setInputParentId] = useState<Id<"files">>();
 	const [renameInputId, setRenameInputId] = useState<Id<"files">>();
+	const [syncTargetId, setSyncTargetId] = useState<Id<"files">>();
 	const request = useFileExplorerRequest((state) => state.request);
 	const activeEntryId = activeEntry?._id;
+
+	const { preloadedResult: project } = useProjectsGetOwnedById();
+	const editorOpenPreview = useFileEditorStore((state) => state.openPreview);
+	const editorOpenFile = useFileEditorStore((state) => state.openFile);
 
 	const activePath = useQuery(
 		api.files.getOwnedPathToRoot,
@@ -37,30 +44,87 @@ export default function useFileTreeState() {
 			: "skip",
 	);
 
-	const handleRequest = useCallback((nextRequest: FileExplorerRequest) => {
-		switch (nextRequest.type) {
-			case "collapse-all": {
-				setExpandedIds([]);
-				setIsCreateInputOpen(false);
-				setInputParentId(undefined);
-				return;
-			}
+	const syncTargetPath = useQuery(
+		api.files.getOwnedPathToRoot,
+		syncTargetId
+			? {
+					fileId: syncTargetId,
+				}
+			: "skip",
+	);
 
-			case "sync-selection-from-editor": {
-				// Placeholder: actual selection syncing will be implemented when editor events are wired.
-				return;
-			}
+	const expandPathToFile = useCallback(
+		(
+			fileId: Id<"files">,
+			path: { folderPathIds: Id<"files">[] } | undefined,
+		) => {
+			setActiveEntry({
+				_id: fileId,
+				type: "file",
+				parentId: undefined,
+			});
 
-			case "clear-selection": {
-				setActiveEntry(undefined);
-				return;
-			}
+			if (!path) return;
 
-			default: {
-				return nextRequest satisfies never;
+			setExpandedIds((prev) => [
+				...new Set([...prev, ...path.folderPathIds]),
+			]);
+		},
+		[],
+	);
+
+	/**
+	 * Helper to add all folder IDs from a path to the expanded set.
+	 */
+	const addPathToExpandedIds = useCallback(
+		(path: { folderPathIds: Id<"files">[] } | undefined) => {
+			if (!path) return;
+
+			setExpandedIds((prev) => [
+				...new Set([...prev, ...path.folderPathIds]),
+			]);
+		},
+		[],
+	);
+
+	useEffect(() => {
+		if (!syncTargetId || !syncTargetPath) return;
+
+		expandPathToFile(syncTargetId, syncTargetPath);
+		setSyncTargetId(undefined);
+	}, [syncTargetId, syncTargetPath, expandPathToFile]);
+
+	const handleRequest = useCallback(
+		(nextRequest: FileExplorerRequest) => {
+			switch (nextRequest.type) {
+				case "collapse-all": {
+					setExpandedIds([]);
+					setIsCreateInputOpen(false);
+					setInputParentId(undefined);
+					return;
+				}
+
+				case "sync-selection-from-editor": {
+					const { entryId } = nextRequest;
+
+					if (activeEntryId === entryId) return;
+
+					setSyncTargetId(entryId);
+					return;
+				}
+
+				case "clear-selection": {
+					setActiveEntry(undefined);
+					return;
+				}
+
+				default: {
+					return nextRequest satisfies never;
+				}
 			}
-		}
-	}, []);
+		},
+		[activeEntryId],
+	);
 
 	useRequestConsumer(request, handleRequest);
 
@@ -105,11 +169,9 @@ export default function useFileTreeState() {
 				return;
 			}
 
-			setExpandedIds((prev) => [
-				...new Set([...prev, ...activePath.folderPathIds]),
-			]);
+			addPathToExpandedIds(activePath);
 		},
-		[activeEntry, activePath],
+		[activeEntry, activePath, addPathToExpandedIds],
 	);
 
 	const closeRenameInput = useCallback(() => {
@@ -139,10 +201,22 @@ export default function useFileTreeState() {
 					return [...prev, file._id];
 				});
 			}
+
+			if (file.type === "file") {
+				editorOpenPreview(project._id, file._id);
+			}
 		},
-		[activeEntry],
+		[activeEntry, editorOpenPreview, project._id],
 	);
 
+	const onEntryDoubleClick = useCallback(
+		(file: FileTreeActiveEntry) => {
+			if (file.type === "file") {
+				editorOpenFile(project._id, file._id);
+			}
+		},
+		[editorOpenFile, project._id],
+	);
 	return {
 		expandedIds,
 		activeEntryId,
@@ -155,5 +229,6 @@ export default function useFileTreeState() {
 		closeRenameInput,
 		openRenameInput,
 		onEntryClick,
+		onEntryDoubleClick,
 	};
 }

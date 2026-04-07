@@ -5,6 +5,7 @@ const DEFAULT_MAIN_SIZE = 1000;
 
 import { Allotment } from "allotment";
 import FileExplorer from "../explorer/file-explorer";
+import FileEditor from "./file-editor";
 
 export default function EditorBase() {
 	return (
@@ -22,7 +23,7 @@ export default function EditorBase() {
 				</Allotment.Pane>
 
 				<Allotment.Pane>
-					<main>Main Pane</main>
+					<FileEditor />
 				</Allotment.Pane>
 			</Allotment>
 		</div>

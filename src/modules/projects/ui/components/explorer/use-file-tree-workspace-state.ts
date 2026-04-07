@@ -7,8 +7,11 @@ import type {
 	FileCreateInputType,
 	FileWorkspaceRequest,
 } from "@modules/projects/stores/file-workspace.types";
+import { useFileEditorStore } from "@modules/projects/stores/use-file-editor-store";
+import { useFileExplorerRequest } from "@modules/projects/stores/use-file-explorer-request";
 import { useFileWorkspaceRequest } from "@modules/projects/stores/use-file-workspace-request";
 import { useCallback, useState } from "react";
+import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 
 interface Options {
 	openRenameInput: (fileId: Id<"files">) => void;
@@ -29,7 +32,15 @@ export default function useFileTreeWorkspaceState({
 	openRenameInput,
 	openCreateInput,
 }: Options): FileTreeWorkspaceState {
+	const { preloadedResult: project } = useProjectsGetOwnedById();
 	const request = useFileWorkspaceRequest((state) => state.request);
+	const requestSyncSelection = useFileExplorerRequest(
+		(state) => state.requestSyncSelection,
+	);
+	const requestClearSelection = useFileExplorerRequest(
+		(state) => state.requestClearSelection,
+	);
+	const closeFile = useFileEditorStore((state) => state.closeFile);
 
 	const removeFile = useFilesRemove();
 
@@ -90,6 +101,19 @@ export default function useFileTreeWorkspaceState({
 		message: `This will permanently delete "${deleteTargetName}" and cannot be undone.`,
 		onConfirm: () => {
 			if (!deleteTargetFile) return;
+
+			if (deleteTargetFile.type === "file") {
+				const nextActiveFileId = closeFile(
+					project._id,
+					deleteTargetFile._id,
+				);
+
+				if (nextActiveFileId) {
+					requestSyncSelection(nextActiveFileId);
+				} else {
+					requestClearSelection();
+				}
+			}
 
 			void removeFile({ fileId: deleteTargetFile._id }).catch((error) => {
 				console.error("Failed to delete explorer entry", error);

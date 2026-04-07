@@ -42,7 +42,11 @@ export const getOwnedPathToRoot = query({
 	handler: withAuth(async (ctx, args: { fileId: Id<"files"> }) => {
 		const file = await ctx.db.get("files", args.fileId);
 
-		if (!file) throw createHttpError.NotFound("File not found");
+		if (!file) {
+			return {
+				folderPathIds: [],
+			};
+		}
 
 		await verifyProjectOwnership(ctx, file.projectId);
 

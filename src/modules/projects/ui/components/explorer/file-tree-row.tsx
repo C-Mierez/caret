@@ -13,7 +13,8 @@ interface Props {
 }
 
 export default function FileTreeRow({ file, depth }: Props) {
-	const { activeEntryId, expandedIds, onEntryClick } = useFileTreeContext();
+	const { activeEntryId, expandedIds, onEntryClick, onEntryDoubleClick } =
+		useFileTreeContext();
 	const isActive = activeEntryId === file._id;
 	const ContextMenuWrapper =
 		file.type === "folder" ? FolderContextMenu : FileContextMenu;
@@ -23,6 +24,7 @@ export default function FileTreeRow({ file, depth }: Props) {
 			<button
 				type="button"
 				onClick={() => onEntryClick(file)}
+				onDoubleClick={() => onEntryDoubleClick(file)}
 				className={cn(
 					"flex w-max min-w-full items-end gap-1 py-1 pr-2 text-start",
 					!isActive && "hover:bg-muted",

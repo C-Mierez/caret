@@ -19,7 +19,9 @@ export default function FileContextMenu({ children, file }: Props) {
 
 	return (
 		<ContextMenu>
-			<ContextMenuTrigger>{children}</ContextMenuTrigger>
+			<ContextMenuTrigger className="size-full">
+				{children}
+			</ContextMenuTrigger>
 			<ContextMenuContent>
 				{items.map((item) => (
 					<ContextMenuItem key={item.key} onClick={item.onSelect}>

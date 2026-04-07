@@ -8,9 +8,7 @@ export default function useFileExplorerState() {
 	const requestCollapseAll = useFileExplorerRequest(
 		(state) => state.requestCollapseAll,
 	);
-	const requestSyncSelection = useFileExplorerRequest(
-		(state) => state.requestSyncSelection,
-	);
+
 	const requestClearSelection = useFileExplorerRequest(
 		(state) => state.requestClearSelection,
 	);
@@ -19,7 +17,6 @@ export default function useFileExplorerState() {
 		isFileTreeOpen,
 		toggleFileTree,
 		requestCollapseAll,
-		requestSyncSelection,
 		requestClearSelection,
 	};
 }
