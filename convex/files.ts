@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import createHttpError from "http-errors";
-import type { Id } from "./_generated/dataModel";
+import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { verifyProjectOwnership } from "./lib/auth";
 import { withAuth } from "./lib/hoc";
@@ -50,7 +50,7 @@ export const getOwnedPathToRoot = query({
 
 		await verifyProjectOwnership(ctx, file.projectId);
 
-		const folderPathIds: Id<"files">[] = [];
+		const folderPathIds: Pick<Doc<"files">, "_id" | "name">[] = [];
 		let currentId: Id<"files"> | undefined =
 			file.type === "folder" ? file._id : file.parentId;
 
@@ -60,7 +60,10 @@ export const getOwnedPathToRoot = query({
 			if (!current || current.projectId !== file.projectId) break;
 
 			if (current.type === "folder") {
-				folderPathIds.unshift(current._id);
+				folderPathIds.unshift({
+					_id: current._id,
+					name: current.name,
+				});
 			}
 
 			currentId = current.parentId;

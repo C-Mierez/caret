@@ -90,7 +90,15 @@ export default function useFileTreeState() {
 	useEffect(() => {
 		if (!syncTargetId || !syncTargetPath) return;
 
-		expandPathToFile(syncTargetId, syncTargetPath);
+		expandPathToFile(
+			syncTargetId,
+			// Transform {_id, name}[] to just {_id}[]
+			{
+				folderPathIds: syncTargetPath.folderPathIds.map(
+					({ _id }) => _id,
+				),
+			},
+		);
 		setSyncTargetId(undefined);
 	}, [syncTargetId, syncTargetPath, expandPathToFile]);
 
@@ -169,7 +177,9 @@ export default function useFileTreeState() {
 				return;
 			}
 
-			addPathToExpandedIds(activePath);
+			addPathToExpandedIds({
+				folderPathIds: activePath.folderPathIds.map(({ _id }) => _id),
+			});
 		},
 		[activeEntry, activePath, addPathToExpandedIds],
 	);

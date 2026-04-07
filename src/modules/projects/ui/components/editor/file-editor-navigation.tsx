@@ -6,7 +6,7 @@ import type { Doc, Id } from "@convex/_generated/dataModel";
 import { cn } from "@lib/utils";
 import { FileIcon, FolderIcon } from "@react-symbols/icons/utils";
 import { useQuery } from "convex/react";
-import { XIcon } from "lucide-react";
+import { Loader2Icon, XIcon } from "lucide-react";
 import FileContextMenu from "../file-actions/file-context-menu";
 import useFileEditorNavigationState from "./use-file-editor-navigation-state";
 
@@ -76,8 +76,6 @@ function FileEditorTab({
 		fileId,
 	});
 
-	if (!file) return null;
-
 	return (
 		<li
 			className={cn(
@@ -87,36 +85,42 @@ function FileEditorTab({
 				isPreview && "italic",
 			)}
 		>
-			<FileContextMenu file={file}>
-				<button
-					type="button"
-					onClick={() => onEntryClick(file)}
-					onDoubleClick={() => onEntryDoubleClick(file)}
-					className="flex h-full w-max items-center gap-1"
-				>
-					{file.type === "folder" ? (
-						<FolderIcon
-							folderName={file.name}
-							className="size-4 shrink-0"
-						/>
-					) : (
-						<FileIcon
-							fileName={file.name}
-							autoAssign
-							className="size-4 shrink-0"
-						/>
-					)}
-					{file.name}
-				</button>
-			</FileContextMenu>
-
-			<button
-				type="button"
-				onClick={() => onCloseFile(file._id)}
-				className="invisible text-muted-foreground hover:bg-muted hover:text-foreground group-hover:visible"
-			>
-				<XIcon className="size-4" />
-			</button>
+			{!file && (
+				<Loader2Icon className="size-3 animate-spin text-muted-foreground" />
+			)}
+			{file && (
+				<>
+					<FileContextMenu file={file}>
+						<button
+							type="button"
+							onClick={() => onEntryClick(file)}
+							onDoubleClick={() => onEntryDoubleClick(file)}
+							className="flex h-full w-max items-center gap-1"
+						>
+							{file.type === "folder" ? (
+								<FolderIcon
+									folderName={file.name}
+									className="size-4 shrink-0"
+								/>
+							) : (
+								<FileIcon
+									fileName={file.name}
+									autoAssign
+									className="size-4 shrink-0"
+								/>
+							)}
+							{file.name}
+						</button>
+					</FileContextMenu>
+					<button
+						type="button"
+						onClick={() => onCloseFile(file._id)}
+						className="invisible text-muted-foreground hover:bg-muted hover:text-foreground group-hover:visible"
+					>
+						<XIcon className="size-4" />
+					</button>
+				</>
+			)}
 		</li>
 	);
 }
