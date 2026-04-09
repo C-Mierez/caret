@@ -48,13 +48,16 @@ export default function ProjectsGetOwnedInfinite({
 		api.projects.getOwnedCount,
 		shouldQuery ? {} : "skip",
 	);
-	const totalProjects = reactiveTotalProjects ?? initialTotalProjects;
+	const totalProjects = shouldQuery
+		? (reactiveTotalProjects ?? initialTotalProjects)
+		: 0;
 
-	const projects =
-		paginatedResult.results.length > 0 ||
-		paginatedResult.status !== "LoadingFirstPage"
+	const projects = shouldQuery
+		? paginatedResult.results.length > 0 ||
+			paginatedResult.status !== "LoadingFirstPage"
 			? paginatedResult.results
-			: initialData.page;
+			: initialData.page
+		: [];
 
 	const featuredProject = projects[0] ?? null;
 	const recentProjects = projects.slice(1);
