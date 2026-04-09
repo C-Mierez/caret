@@ -74,18 +74,6 @@ export const useFileEditorStore = create<FileEditorStore>((set, get) => ({
 			});
 
 			set({ projectFileStates });
-		} else {
-			// Remove from open files and set as preview
-			const newOpenFiles = openFiles.filter((id) => id !== fileId);
-
-			projectFileStates.set(projectId, {
-				...state,
-				openFiles: newOpenFiles,
-				activeFileId: fileId,
-				previewFileId: fileId,
-			});
-
-			set({ projectFileStates });
 		}
 	},
 	closeFile(projectId, fileId) {

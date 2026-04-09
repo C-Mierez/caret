@@ -42,6 +42,7 @@ export default function useFileEditorContentState() {
 		content: string;
 	} | null>(null);
 	const activeFileName = activeFile?.name ?? "";
+	const hasLoadedActiveFile = activeFile !== undefined;
 
 	const languageExtension = useMemo(() => {
 		return getLanguageExtension(activeFileName);
@@ -64,7 +65,14 @@ export default function useFileEditorContentState() {
 	useEffect(() => {
 		const container = editorContainerRef.current;
 
-		if (!container || !activeFileId) return;
+		if (!container || !activeFileId || !hasLoadedActiveFile) return;
+
+		if (saveTimeoutRef.current) {
+			clearTimeout(saveTimeoutRef.current);
+			saveTimeoutRef.current = null;
+		}
+
+		pendingSaveRef.current = null;
 
 		const scheduleSave = (content: string) => {
 			pendingSaveRef.current = {
@@ -98,7 +106,7 @@ export default function useFileEditorContentState() {
 		};
 
 		const view = new EditorView({
-			doc: "",
+			doc: activeFile?.content ?? "",
 			parent: container,
 			extensions: [
 				customSetup,
@@ -126,7 +134,13 @@ export default function useFileEditorContentState() {
 			editorViewRef.current = null;
 			view.destroy();
 		};
-	}, [activeFileId, languageExtension, updateFileContent]);
+	}, [
+		activeFile?.content,
+		activeFileId,
+		hasLoadedActiveFile,
+		languageExtension,
+		updateFileContent,
+	]);
 
 	useEffect(() => {
 		if (!activeFileId || activeFile === undefined) return;
@@ -140,6 +154,13 @@ export default function useFileEditorContentState() {
 		if (currentContent === nextContent) {
 			return;
 		}
+
+		if (saveTimeoutRef.current) {
+			clearTimeout(saveTimeoutRef.current);
+			saveTimeoutRef.current = null;
+		}
+
+		pendingSaveRef.current = null;
 
 		isApplyingExternalContentRef.current = true;
 		view.dispatch({

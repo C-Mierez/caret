@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@clerk/nextjs";
 import type { api } from "@convex/_generated/api";
 import type { Doc } from "@convex/_generated/dataModel";
 import { type Preloaded, usePreloadedQuery } from "convex/react";
@@ -18,10 +19,7 @@ interface Props {
 	children: React.ReactNode;
 }
 
-export default function ProjectsGetOwnedAll({
-	initialProjects,
-	children,
-}: Props) {
+function SignedInProjectsGetOwnedAll({ initialProjects, children }: Props) {
 	const preloadedResult = usePreloadedQuery(initialProjects);
 
 	const value: ProjectsDataContextType = {
@@ -32,6 +30,31 @@ export default function ProjectsGetOwnedAll({
 		<ProjectsDataContext.Provider value={value}>
 			{children}
 		</ProjectsDataContext.Provider>
+	);
+}
+
+export default function ProjectsGetOwnedAll({
+	initialProjects,
+	children,
+}: Props) {
+	const { isLoaded, isSignedIn } = useAuth();
+
+	if (!isLoaded || !isSignedIn) {
+		const value: ProjectsDataContextType = {
+			preloadedResult: [],
+		};
+
+		return (
+			<ProjectsDataContext.Provider value={value}>
+				{children}
+			</ProjectsDataContext.Provider>
+		);
+	}
+
+	return (
+		<SignedInProjectsGetOwnedAll initialProjects={initialProjects}>
+			{children}
+		</SignedInProjectsGetOwnedAll>
 	);
 }
 

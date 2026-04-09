@@ -58,10 +58,13 @@ export default function useFileTreeState() {
 			fileId: Id<"files">,
 			path: { folderPathIds: Id<"files">[] } | undefined,
 		) => {
+			const parentId =
+				path?.folderPathIds[path.folderPathIds.length - 1] ?? undefined;
+
 			setActiveEntry({
 				_id: fileId,
 				type: "file",
-				parentId: undefined,
+				parentId,
 			});
 
 			if (!path) return;

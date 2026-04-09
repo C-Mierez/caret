@@ -8,10 +8,12 @@ import useFileEditorNavigationState from "@modules/file-editor/hooks/use-file-ed
 import FileContextMenu from "@modules/file-explorer/ui/components/file-actions/file-context-menu";
 import { FileIcon, FolderIcon } from "@react-symbols/icons/utils";
 import { useQuery } from "convex/react";
-import { Loader2Icon, XIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
+import { useEffect, useMemo } from "react";
 
 export default function FileEditorNavigation() {
 	const {
+		project,
 		openFiles,
 		activeFileId,
 		previewFileId,
@@ -20,14 +22,40 @@ export default function FileEditorNavigation() {
 		onCloseFile,
 	} = useFileEditorNavigationState();
 
+	const allFiles = useQuery(api.files.getOwnedAll, {
+		projectId: project._id,
+	});
+
+	const filesById = useMemo(() => {
+		if (!allFiles) return undefined;
+
+		return new Map(allFiles.map((file) => [file._id, file]));
+	}, [allFiles]);
+
+	useEffect(() => {
+		if (!filesById) return;
+
+		for (const fileId of openFiles) {
+			if (!filesById.has(fileId)) {
+				onCloseFile(fileId);
+			}
+		}
+
+		if (previewFileId && !filesById.has(previewFileId)) {
+			onCloseFile(previewFileId);
+		}
+	}, [filesById, onCloseFile, openFiles, previewFileId]);
+
 	return (
 		<ScrollArea className="group/scroll-area">
 			<ul className="flex h-tabs">
 				{openFiles.map((fileId) => {
+					const file = filesById?.get(fileId);
+
 					return (
 						<FileEditorTab
 							key={fileId}
-							fileId={fileId}
+							file={file}
 							isActive={fileId === activeFileId}
 							isPreview={fileId === previewFileId}
 							onEntryClick={onEntryClick}
@@ -38,7 +66,7 @@ export default function FileEditorNavigation() {
 				})}
 				{previewFileId && (
 					<FileEditorTab
-						fileId={previewFileId}
+						file={filesById?.get(previewFileId)}
 						isActive={previewFileId === activeFileId}
 						isPreview={true}
 						onEntryClick={onEntryClick}
@@ -56,7 +84,7 @@ export default function FileEditorNavigation() {
 }
 
 interface FileEditorTabProps {
-	fileId: Id<"files">;
+	file: Doc<"files"> | undefined;
 	isActive: boolean;
 	isPreview: boolean;
 	onEntryClick: (file: Doc<"files">) => void;
@@ -65,16 +93,14 @@ interface FileEditorTabProps {
 }
 
 function FileEditorTab({
-	fileId,
+	file,
 	isActive,
 	isPreview,
 	onEntryClick,
 	onEntryDoubleClick,
 	onCloseFile,
 }: FileEditorTabProps) {
-	const file = useQuery(api.files.getOwnedById, {
-		fileId,
-	});
+	if (!file) return null;
 
 	return (
 		<li
@@ -85,42 +111,36 @@ function FileEditorTab({
 				isPreview && "italic",
 			)}
 		>
-			{!file && (
-				<Loader2Icon className="size-3 animate-spin text-muted-foreground" />
-			)}
-			{file && (
-				<>
-					<FileContextMenu file={file}>
-						<button
-							type="button"
-							onClick={() => onEntryClick(file)}
-							onDoubleClick={() => onEntryDoubleClick(file)}
-							className="flex h-full w-max items-center gap-1"
-						>
-							{file.type === "folder" ? (
-								<FolderIcon
-									folderName={file.name}
-									className="size-4 shrink-0"
-								/>
-							) : (
-								<FileIcon
-									fileName={file.name}
-									autoAssign
-									className="size-4 shrink-0"
-								/>
-							)}
-							{file.name}
-						</button>
-					</FileContextMenu>
-					<button
-						type="button"
-						onClick={() => onCloseFile(file._id)}
-						className="invisible text-muted-foreground hover:bg-muted hover:text-foreground group-hover:visible"
-					>
-						<XIcon className="size-4" />
-					</button>
-				</>
-			)}
+			<FileContextMenu file={file}>
+				<button
+					type="button"
+					onClick={() => onEntryClick(file)}
+					onDoubleClick={() => onEntryDoubleClick(file)}
+					className="flex h-full w-max items-center gap-1"
+				>
+					{file.type === "folder" ? (
+						<FolderIcon
+							folderName={file.name}
+							className="size-4 shrink-0"
+						/>
+					) : (
+						<FileIcon
+							fileName={file.name}
+							autoAssign
+							className="size-4 shrink-0"
+						/>
+					)}
+					{file.name}
+				</button>
+			</FileContextMenu>
+			<button
+				type="button"
+				onClick={() => onCloseFile(file._id)}
+				aria-label={`Close ${file.name || "tab"}`}
+				className="text-muted-foreground opacity-0 hover:bg-muted hover:text-foreground focus:opacity-100 focus-visible:opacity-100 group-hover:opacity-100"
+			>
+				<XIcon className="size-4" />
+			</button>
 		</li>
 	);
 }
