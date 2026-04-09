@@ -106,6 +106,95 @@ export function optimisticRenameFileCache(
 	}
 }
 
+export function optimisticUpdateFileContentCache(
+	localStore: OptimisticLocalStore,
+	fileId: Id<"files">,
+	content: string,
+	updatedAt: number,
+) {
+	const cachedFileById = localStore.getQuery(api.files.getOwnedById, {
+		fileId,
+	});
+
+	if (cachedFileById !== undefined && cachedFileById.type === "file") {
+		localStore.setQuery(
+			api.files.getOwnedById,
+			{ fileId },
+			{
+				...cachedFileById,
+				content,
+				updatedAt,
+			},
+		);
+	}
+
+	for (const cachedQuery of localStore.getAllQueries(api.files.getOwnedAll)) {
+		if (cachedQuery.value === undefined) {
+			continue;
+		}
+
+		let didUpdate = false;
+		const updatedFiles = cachedQuery.value.map((file) =>
+			file._id === fileId && file.type === "file"
+				? {
+						...file,
+						content,
+						updatedAt,
+					}
+				: file,
+		);
+
+		for (const file of cachedQuery.value) {
+			if (file._id === fileId && file.type === "file") {
+				didUpdate = true;
+				break;
+			}
+		}
+
+		if (didUpdate) {
+			localStore.setQuery(
+				api.files.getOwnedAll,
+				cachedQuery.args,
+				updatedFiles,
+			);
+		}
+	}
+
+	for (const cachedQuery of localStore.getAllQueries(
+		api.files.getOwnedSorted,
+	)) {
+		if (cachedQuery.value === undefined) {
+			continue;
+		}
+
+		let didUpdate = false;
+		const updatedFiles = cachedQuery.value.map((file) =>
+			file._id === fileId && file.type === "file"
+				? {
+						...file,
+						content,
+						updatedAt,
+					}
+				: file,
+		);
+
+		for (const file of cachedQuery.value) {
+			if (file._id === fileId && file.type === "file") {
+				didUpdate = true;
+				break;
+			}
+		}
+
+		if (didUpdate) {
+			localStore.setQuery(
+				api.files.getOwnedSorted,
+				cachedQuery.args,
+				updatedFiles,
+			);
+		}
+	}
+}
+
 export function optimisticRemoveFileCache(
 	localStore: OptimisticLocalStore,
 	fileId: Id<"files">,
