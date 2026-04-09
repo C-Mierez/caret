@@ -1,10 +1,10 @@
 import { api } from "@convex/_generated/api";
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import useRequestConsumer from "@hooks/use-request-consumer";
-import type { FileExplorerRequest } from "@modules/projects/stores/file-explorer.types";
-import type { FileCreateInputType } from "@modules/projects/stores/file-workspace.types";
-import { useFileEditorStore } from "@modules/projects/stores/use-file-editor-store";
-import { useFileExplorerRequest } from "@modules/projects/stores/use-file-explorer-request";
+import { useFileEditorStore } from "@modules/file-editor/stores/use-file-editor-store";
+import type { FileExplorerRequest } from "@modules/file-explorer/stores/file-explorer.types";
+import type { FileCreateInputType } from "@modules/file-explorer/stores/file-workspace.types";
+import { useFileExplorerRequest } from "@modules/file-explorer/stores/use-file-explorer-request";
 import { useQuery } from "convex/react";
 import { useCallback, useEffect, useState } from "react";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";

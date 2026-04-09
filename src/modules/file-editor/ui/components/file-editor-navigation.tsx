@@ -4,11 +4,11 @@ import { ScrollArea, ScrollBar } from "@components/ui/scroll-area";
 import { api } from "@convex/_generated/api";
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import { cn } from "@lib/utils";
+import useFileEditorNavigationState from "@modules/file-editor/hooks/use-file-editor-navigation-state";
+import FileContextMenu from "@modules/file-explorer/ui/components/file-actions/file-context-menu";
 import { FileIcon, FolderIcon } from "@react-symbols/icons/utils";
 import { useQuery } from "convex/react";
 import { Loader2Icon, XIcon } from "lucide-react";
-import FileContextMenu from "../file-actions/file-context-menu";
-import useFileEditorNavigationState from "./use-file-editor-navigation-state";
 
 export default function FileEditorNavigation() {
 	const {

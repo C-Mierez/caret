@@ -1,7 +1,7 @@
 "use client";
 
 import CaretSvg from "@components/svg/caret-svg";
-import useFileEditorContentState from "./use-file-editor-content-state";
+import useFileEditorContentState from "@modules/file-editor/hooks/use-file-editor-content-state";
 
 export default function FileEditorContent() {
 	const {

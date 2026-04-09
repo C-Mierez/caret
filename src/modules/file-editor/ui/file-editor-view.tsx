@@ -3,11 +3,11 @@ const MAX_SIDEBAR_WIDTH = 800;
 const DEFAULT_SIDEBAR_WIDTH = 350;
 const DEFAULT_MAIN_SIZE = 1000;
 
+import FileExplorerView from "@modules/file-explorer/ui/file-explorer-view";
 import { Allotment } from "allotment";
-import FileExplorer from "../explorer/file-explorer";
-import FileEditor from "./file-editor";
+import FileEditor from "./components/file-editor";
 
-export default function EditorBase() {
+export default function FileEditorView() {
 	return (
 		<div className="relative size-full">
 			<Allotment
@@ -19,7 +19,7 @@ export default function EditorBase() {
 					maxSize={MAX_SIDEBAR_WIDTH}
 					preferredSize={DEFAULT_SIDEBAR_WIDTH}
 				>
-					<FileExplorer />
+					<FileExplorerView />
 				</Allotment.Pane>
 
 				<Allotment.Pane>

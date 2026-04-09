@@ -1,5 +1,5 @@
 import { api } from "@convex/_generated/api";
-import { useFileEditorStore } from "@modules/projects/stores/use-file-editor-store";
+import { useFileEditorStore } from "@modules/file-editor/stores/use-file-editor-store";
 import { useQuery } from "convex/react";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 

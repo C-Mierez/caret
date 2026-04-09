@@ -1,6 +1,6 @@
 import type { Doc, Id } from "@convex/_generated/dataModel";
-import { useFileEditorStore } from "@modules/projects/stores/use-file-editor-store";
-import { useFileExplorerRequest } from "@modules/projects/stores/use-file-explorer-request";
+import { useFileEditorStore } from "@modules/file-editor/stores/use-file-editor-store";
+import { useFileExplorerRequest } from "@modules/file-explorer/stores/use-file-explorer-request";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 
 export default function useFileEditorNavigationState() {

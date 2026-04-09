@@ -1,6 +1,6 @@
 import { javascript } from "@codemirror/lang-javascript";
 import { oneDark } from "@codemirror/theme-one-dark";
-import { useFileEditorStore } from "@modules/projects/stores/use-file-editor-store";
+import { useFileEditorStore } from "@modules/file-editor/stores/use-file-editor-store";
 import { basicSetup, EditorView } from "codemirror";
 import { useEffect, useRef } from "react";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";

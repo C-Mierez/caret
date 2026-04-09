@@ -1,5 +1,5 @@
-import type { FileActionTarget } from "@modules/projects/stores/file-workspace.types";
-import { useFileWorkspaceRequest } from "@modules/projects/stores/use-file-workspace-request";
+import type { FileActionTarget } from "@modules/file-explorer/stores/file-workspace.types";
+import { useFileWorkspaceRequest } from "@modules/file-explorer/stores/use-file-workspace-request";
 
 export type FileContextMenuActionKey =
 	| "open"

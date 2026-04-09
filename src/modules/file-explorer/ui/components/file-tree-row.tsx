@@ -2,8 +2,8 @@ import TogglableChevron from "@components/togglable-chevron";
 import type { Doc } from "@convex/_generated/dataModel";
 import { cn } from "@lib/utils";
 import { FileIcon, FolderIcon } from "@react-symbols/icons/utils";
-import FileContextMenu from "../file-actions/file-context-menu";
-import FolderContextMenu from "../file-actions/folder-context-menu";
+import FileContextMenu from "./file-actions/file-context-menu";
+import FolderContextMenu from "./file-actions/folder-context-menu";
 import { useFileTreeContext } from "./file-tree-context";
 import { getFilePadding } from "./utils";
 

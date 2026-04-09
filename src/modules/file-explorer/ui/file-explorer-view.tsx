@@ -2,13 +2,13 @@
 
 import SimpleTooltip from "@components/simple-tooltip";
 import TogglableChevron from "@components/togglable-chevron";
-import { useFileWorkspaceRequest } from "@modules/projects/stores/use-file-workspace-request";
+import useFileExplorerState from "@modules/file-explorer/hooks/use-file-explorer-state";
+import { useFileWorkspaceRequest } from "@modules/file-explorer/stores/use-file-workspace-request";
 import { CopyMinusIcon, FilePlusIcon, FolderPlusIcon } from "lucide-react";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
-import FileTreeRoot from "./file-tree";
-import useFileExplorerState from "./use-file-explorer-state";
+import FileTreeRoot from "./components/file-tree";
 
-export default function FileExplorer() {
+export default function FileExplorerView() {
 	const { preloadedResult: project } = useProjectsGetOwnedById();
 	const requestCreateInput = useFileWorkspaceRequest(
 		(state) => state.requestCreateInput,

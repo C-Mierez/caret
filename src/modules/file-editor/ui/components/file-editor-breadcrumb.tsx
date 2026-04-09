@@ -8,10 +8,10 @@ import {
 	BreadcrumbPage,
 	BreadcrumbSeparator,
 } from "@components/ui/breadcrumb";
+import useFileEditorBreadcrumbState from "@modules/file-editor/hooks/use-file-editor-breadcrumb-state";
 import { FileIcon, FolderIcon } from "@react-symbols/icons/utils";
 import { Loader2Icon } from "lucide-react";
 import React from "react";
-import useFileEditorBreadcrumbState from "./use-file-editor-breadcrumb-state";
 
 export default function FileEditorBreadcrumb() {
 	const { openFiles, previewFileId, activeFileId, activePath, activeFile } =

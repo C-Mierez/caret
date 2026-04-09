@@ -1,15 +1,15 @@
 import type { Id } from "@convex/_generated/dataModel";
 import useModal, { type ModalProps } from "@hooks/use-modal";
 import useRequestConsumer from "@hooks/use-request-consumer";
-import useFilesRemove from "@modules/projects/hooks/use-files-remove";
+import { useFileEditorStore } from "@modules/file-editor/stores/use-file-editor-store";
 import type {
 	FileActionTarget,
 	FileCreateInputType,
 	FileWorkspaceRequest,
-} from "@modules/projects/stores/file-workspace.types";
-import { useFileEditorStore } from "@modules/projects/stores/use-file-editor-store";
-import { useFileExplorerRequest } from "@modules/projects/stores/use-file-explorer-request";
-import { useFileWorkspaceRequest } from "@modules/projects/stores/use-file-workspace-request";
+} from "@modules/file-explorer/stores/file-workspace.types";
+import { useFileExplorerRequest } from "@modules/file-explorer/stores/use-file-explorer-request";
+import { useFileWorkspaceRequest } from "@modules/file-explorer/stores/use-file-workspace-request";
+import useFilesRemove from "@modules/projects/hooks/use-files-remove";
 import { useCallback, useState } from "react";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 
