@@ -19,6 +19,7 @@ interface Props {
 export default function FileInput({ parentId, depth }: Props) {
 	const { closeCreateInput, createInputType } = useFileTreeContext();
 	const { preloadedResult: project } = useProjectsGetOwnedById();
+	const projectId = project?._id;
 	const createFile = useFilesCreateFile();
 	const createFolder = useFilesCreateFolder();
 	const [value, setValue] = useState("");
@@ -33,7 +34,7 @@ export default function FileInput({ parentId, depth }: Props) {
 		const name = value.trim();
 		closeCreateInput();
 
-		if (!name) return;
+		if (!name || !projectId) return;
 
 		isSubmittingRef.current = true;
 
@@ -41,7 +42,7 @@ export default function FileInput({ parentId, depth }: Props) {
 			if (createInputType === "folder") {
 				await createFolder({
 					name,
-					projectId: project._id,
+					projectId,
 					parentId,
 				});
 				return;
@@ -50,7 +51,7 @@ export default function FileInput({ parentId, depth }: Props) {
 			await createFile({
 				name,
 				content: "",
-				projectId: project._id,
+				projectId,
 				parentId,
 			});
 		} catch (error) {

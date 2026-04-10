@@ -13,7 +13,7 @@ import { useEffect, useMemo } from "react";
 
 export default function FileEditorNavigation() {
 	const {
-		project,
+		projectId,
 		openFiles,
 		activeFileId,
 		previewFileId,
@@ -22,9 +22,14 @@ export default function FileEditorNavigation() {
 		onCloseFile,
 	} = useFileEditorNavigationState();
 
-	const allFiles = useQuery(api.files.getOwnedAll, {
-		projectId: project._id,
-	});
+	const allFiles = useQuery(
+		api.files.getOwnedAll,
+		projectId
+			? {
+					projectId,
+				}
+			: "skip",
+	);
 
 	const filesById = useMemo(() => {
 		if (!allFiles) return undefined;

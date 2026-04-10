@@ -18,6 +18,8 @@ interface Props {
 
 export default function FileTreeRoot({ requestClearSelection }: Props) {
 	const { preloadedResult: project } = useProjectsGetOwnedById();
+	const projectId = project?._id;
+
 	const {
 		expandedIds,
 		activeEntryId,
@@ -43,9 +45,11 @@ export default function FileTreeRoot({ requestClearSelection }: Props) {
 	});
 
 	// Avoid potential rerenders of the entire tree
-	const providerValue = useMemo(
-		() => ({
-			projectId: project._id,
+	const providerValue = useMemo(() => {
+		if (!projectId) return null;
+
+		return {
+			projectId,
 			isCreateInputOpen,
 			closeCreateInput,
 			createInputType,
@@ -57,22 +61,25 @@ export default function FileTreeRoot({ requestClearSelection }: Props) {
 			activeEntryId,
 			onEntryClick,
 			onEntryDoubleClick,
-		}),
-		[
-			project._id,
-			isCreateInputOpen,
-			closeCreateInput,
-			createInputType,
-			inputParentId,
-			renameInputId,
-			closeRenameInput,
-			openRenameInput,
-			expandedIds,
-			activeEntryId,
-			onEntryClick,
-			onEntryDoubleClick,
-		],
-	);
+		};
+	}, [
+		projectId,
+		isCreateInputOpen,
+		closeCreateInput,
+		createInputType,
+		inputParentId,
+		renameInputId,
+		closeRenameInput,
+		openRenameInput,
+		expandedIds,
+		activeEntryId,
+		onEntryClick,
+		onEntryDoubleClick,
+	]);
+
+	if (!providerValue) {
+		return null;
+	}
 
 	return (
 		<FileTreeProvider value={providerValue}>

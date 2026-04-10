@@ -32,12 +32,13 @@ export default function useFileTreeState() {
 	const activeEntryId = activeEntry?._id;
 
 	const { preloadedResult: project } = useProjectsGetOwnedById();
+	const projectId = project?._id;
 	const editorOpenPreview = useFileEditorStore((state) => state.openPreview);
 	const editorOpenFile = useFileEditorStore((state) => state.openFile);
 
 	const activePath = useQuery(
 		api.files.getOwnedPathToRoot,
-		activeEntryId
+		projectId && activeEntryId
 			? {
 					fileId: activeEntryId,
 				}
@@ -46,7 +47,7 @@ export default function useFileTreeState() {
 
 	const syncTargetPath = useQuery(
 		api.files.getOwnedPathToRoot,
-		syncTargetId
+		projectId && syncTargetId
 			? {
 					fileId: syncTargetId,
 				}
@@ -197,6 +198,8 @@ export default function useFileTreeState() {
 
 	const onEntryClick = useCallback(
 		(file: FileTreeActiveEntry) => {
+			if (!projectId) return;
+
 			if (activeEntry?._id === file._id) {
 				setActiveEntry(undefined);
 			} else {
@@ -216,19 +219,21 @@ export default function useFileTreeState() {
 			}
 
 			if (file.type === "file") {
-				editorOpenPreview(project._id, file._id);
+				editorOpenPreview(projectId, file._id);
 			}
 		},
-		[activeEntry, editorOpenPreview, project._id],
+		[activeEntry, editorOpenPreview, projectId],
 	);
 
 	const onEntryDoubleClick = useCallback(
 		(file: FileTreeActiveEntry) => {
+			if (!projectId) return;
+
 			if (file.type === "file") {
-				editorOpenFile(project._id, file._id);
+				editorOpenFile(projectId, file._id);
 			}
 		},
-		[editorOpenFile, project._id],
+		[editorOpenFile, projectId],
 	);
 	return {
 		expandedIds,

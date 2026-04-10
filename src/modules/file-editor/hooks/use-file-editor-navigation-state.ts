@@ -5,9 +5,10 @@ import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 
 export default function useFileEditorNavigationState() {
 	const { preloadedResult: project } = useProjectsGetOwnedById();
+	const projectId = project?._id;
 
 	const projectFileState = useFileEditorStore((state) =>
-		state.projectFileStates.get(project._id),
+		projectId ? state.projectFileStates.get(projectId) : undefined,
 	);
 	const openFiles = projectFileState?.openFiles ?? [];
 	const activeFileId = projectFileState?.activeFileId ?? null;
@@ -25,19 +26,25 @@ export default function useFileEditorNavigationState() {
 	const closeFile = useFileEditorStore((state) => state.closeFile);
 
 	const onEntryClick = (file: Doc<"files">) => {
+		if (!projectId) return;
+
 		if (file._id === activeFileId && file._id !== previewFileId) return;
 
-		openPreview(project._id, file._id);
+		openPreview(projectId, file._id);
 		requestSyncSelection(file._id);
 	};
 
 	const onEntryDoubleClick = (file: Doc<"files">) => {
-		openFile(project._id, file._id);
+		if (!projectId) return;
+
+		openFile(projectId, file._id);
 		requestSyncSelection(file._id);
 	};
 
 	const onCloseFile = (fileId: Id<"files">) => {
-		const nextActiveFileId = closeFile(project._id, fileId);
+		if (!projectId) return;
+
+		const nextActiveFileId = closeFile(projectId, fileId);
 
 		if (nextActiveFileId) {
 			requestSyncSelection(nextActiveFileId);
@@ -48,7 +55,7 @@ export default function useFileEditorNavigationState() {
 	};
 
 	return {
-		project,
+		projectId,
 		openFiles,
 		activeFileId,
 		previewFileId,

@@ -8,6 +8,10 @@ import ProjectImportStatusIcon from "../project-import-status-icon";
 export default function BreadcrumbStatus() {
 	const { preloadedResult: project } = useProjectsGetOwnedById();
 
+	if (!project) {
+		return null;
+	}
+
 	return (
 		<SimpleTooltip
 			label={{

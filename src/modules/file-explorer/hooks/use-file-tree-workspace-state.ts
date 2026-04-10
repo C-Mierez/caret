@@ -33,6 +33,7 @@ export default function useFileTreeWorkspaceState({
 	openCreateInput,
 }: Options): FileTreeWorkspaceState {
 	const { preloadedResult: project } = useProjectsGetOwnedById();
+	const projectId = project?._id;
 	const request = useFileWorkspaceRequest((state) => state.request);
 	const requestSyncSelection = useFileExplorerRequest(
 		(state) => state.requestSyncSelection,
@@ -100,11 +101,11 @@ export default function useFileTreeWorkspaceState({
 		title: `Delete ${deleteTargetLabel}`,
 		message: `This will permanently delete "${deleteTargetName}" and cannot be undone.`,
 		onConfirm: () => {
-			if (!deleteTargetFile) return;
+			if (!deleteTargetFile || !projectId) return;
 
 			if (deleteTargetFile.type === "file") {
 				const nextActiveFileId = closeFile(
-					project._id,
+					projectId,
 					deleteTargetFile._id,
 				);
 

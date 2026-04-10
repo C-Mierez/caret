@@ -5,9 +5,10 @@ import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 
 export default function useFileEditorBreadcrumbState() {
 	const { preloadedResult: project } = useProjectsGetOwnedById();
+	const projectId = project?._id;
 
 	const projectFileState = useFileEditorStore((state) =>
-		state.projectFileStates.get(project._id),
+		projectId ? state.projectFileStates.get(projectId) : undefined,
 	);
 	const openFiles = projectFileState?.openFiles ?? [];
 	const activeFileId = projectFileState?.activeFileId ?? null;
@@ -15,7 +16,7 @@ export default function useFileEditorBreadcrumbState() {
 
 	const activePath = useQuery(
 		api.files.getOwnedPathToRoot,
-		activeFileId
+		projectId && activeFileId
 			? {
 					fileId: activeFileId,
 				}
@@ -24,7 +25,7 @@ export default function useFileEditorBreadcrumbState() {
 
 	const activeFile = useQuery(
 		api.files.getOwnedById,
-		activeFileId
+		projectId && activeFileId
 			? {
 					fileId: activeFileId,
 				}

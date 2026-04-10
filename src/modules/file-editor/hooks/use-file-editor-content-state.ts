@@ -17,9 +17,10 @@ import { customTheme } from "../extensions/theme";
 
 export default function useFileEditorContentState() {
 	const { preloadedResult: project } = useProjectsGetOwnedById();
+	const projectId = project?._id;
 
 	const projectFileState = useFileEditorStore((state) =>
-		state.projectFileStates.get(project._id),
+		projectId ? state.projectFileStates.get(projectId) : undefined,
 	);
 
 	const openFiles = projectFileState?.openFiles ?? [];
@@ -29,7 +30,7 @@ export default function useFileEditorContentState() {
 
 	const activeFile = useQuery(
 		api.files.getOwnedById,
-		activeFileId ? { fileId: activeFileId } : "skip",
+		projectId && activeFileId ? { fileId: activeFileId } : "skip",
 	);
 
 	// Code Mirror stuff

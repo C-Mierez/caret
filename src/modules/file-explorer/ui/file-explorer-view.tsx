@@ -20,6 +20,10 @@ export default function FileExplorerView() {
 		requestClearSelection,
 	} = useFileExplorerState();
 
+	if (!project) {
+		return null;
+	}
+
 	return (
 		<section className="flex size-full flex-col bg-muted-alt text-xs">
 			<header className="group relative h-tabs max-w-full border-b-2 bg-muted">
