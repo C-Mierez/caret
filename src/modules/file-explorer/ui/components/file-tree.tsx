@@ -1,6 +1,9 @@
 import ConfirmationModal from "@components/modals/confirmation-modal";
 import { api } from "@convex/_generated/api";
 import type { Doc, Id } from "@convex/_generated/dataModel";
+import useFileTreeInteractions from "@modules/file-explorer/hooks/use-file-tree-interactions";
+import useFileTreeState from "@modules/file-explorer/hooks/use-file-tree-state";
+import useFileTreeWorkspaceState from "@modules/file-explorer/hooks/use-file-tree-workspace-state";
 import { useQuery } from "convex/react";
 import { Fragment, useMemo } from "react";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
@@ -8,9 +11,6 @@ import FileInput from "./file-input";
 import FileRenameInput from "./file-rename-input";
 import { FileTreeProvider, useFileTreeContext } from "./file-tree-context";
 import FileTreeRow from "./file-tree-row";
-import useFileTreeInteractions from "./use-file-tree-interactions";
-import useFileTreeState from "./use-file-tree-state";
-import useFileTreeWorkspaceState from "./use-file-tree-workspace-state";
 
 interface Props {
 	requestClearSelection: () => void;
@@ -18,6 +18,8 @@ interface Props {
 
 export default function FileTreeRoot({ requestClearSelection }: Props) {
 	const { preloadedResult: project } = useProjectsGetOwnedById();
+	const projectId = project?._id;
+
 	const {
 		expandedIds,
 		activeEntryId,
@@ -30,6 +32,7 @@ export default function FileTreeRoot({ requestClearSelection }: Props) {
 		closeRenameInput,
 		openRenameInput,
 		onEntryClick,
+		onEntryDoubleClick,
 	} = useFileTreeState();
 	const { containerRef } = useFileTreeInteractions({
 		activeEntryId,
@@ -42,9 +45,11 @@ export default function FileTreeRoot({ requestClearSelection }: Props) {
 	});
 
 	// Avoid potential rerenders of the entire tree
-	const providerValue = useMemo(
-		() => ({
-			projectId: project._id,
+	const providerValue = useMemo(() => {
+		if (!projectId) return null;
+
+		return {
+			projectId,
 			isCreateInputOpen,
 			closeCreateInput,
 			createInputType,
@@ -55,21 +60,26 @@ export default function FileTreeRoot({ requestClearSelection }: Props) {
 			expandedIds,
 			activeEntryId,
 			onEntryClick,
-		}),
-		[
-			project._id,
-			isCreateInputOpen,
-			closeCreateInput,
-			createInputType,
-			inputParentId,
-			renameInputId,
-			closeRenameInput,
-			openRenameInput,
-			expandedIds,
-			activeEntryId,
-			onEntryClick,
-		],
-	);
+			onEntryDoubleClick,
+		};
+	}, [
+		projectId,
+		isCreateInputOpen,
+		closeCreateInput,
+		createInputType,
+		inputParentId,
+		renameInputId,
+		closeRenameInput,
+		openRenameInput,
+		expandedIds,
+		activeEntryId,
+		onEntryClick,
+		onEntryDoubleClick,
+	]);
+
+	if (!providerValue) {
+		return null;
+	}
 
 	return (
 		<FileTreeProvider value={providerValue}>

@@ -6,7 +6,7 @@ import { type Preloaded, usePreloadedQuery } from "convex/react";
 import { createContext, useContext } from "react";
 
 interface ProjectsDataContextType {
-	preloadedResult: Doc<"projects">;
+	preloadedResult: Doc<"projects"> | null;
 }
 
 const ProjectsDataContext = createContext<ProjectsDataContextType | undefined>(

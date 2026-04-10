@@ -17,6 +17,9 @@ export interface FileTreeContextValue {
 	onEntryClick: (
 		file: Pick<Doc<"files">, "_id" | "type" | "parentId">,
 	) => void;
+	onEntryDoubleClick: (
+		file: Pick<Doc<"files">, "_id" | "type" | "parentId">,
+	) => void;
 }
 
 const FileTreeContext = createContext<FileTreeContextValue | undefined>(

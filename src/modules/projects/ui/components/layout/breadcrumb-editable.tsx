@@ -7,13 +7,17 @@ import { useState } from "react";
 import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 
 export default function BreadcrumbEditable() {
-	const {
-		preloadedResult: { _id: projectId, name: projectName },
-	} = useProjectsGetOwnedById();
+	const { preloadedResult: project } = useProjectsGetOwnedById();
+	const projectId = project?._id;
+	const projectName = project?.name ?? "";
 	const [isEditing, setIsEditing] = useState(false);
 	const [editedName, setEditedName] = useState(projectName);
 
 	const renameMutation = useProjectRename();
+
+	if (!projectId) {
+		return null;
+	}
 
 	const Slot = isEditing ? "div" : "button";
 

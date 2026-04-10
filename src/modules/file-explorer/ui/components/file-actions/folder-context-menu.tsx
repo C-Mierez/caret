@@ -6,20 +6,22 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@components/ui/context-menu";
-import type { FileActionTarget } from "@modules/projects/stores/file-workspace.types";
-import { useFileContextMenuItems } from "./use-file-context-menu-items";
+import type { FileActionTarget } from "@modules/file-explorer/stores/file-workspace.types";
+import { useFolderContextMenuItems } from "./use-file-context-menu-items";
 
 interface Props {
 	children: React.ReactNode;
 	file: FileActionTarget;
 }
 
-export default function FileContextMenu({ children, file }: Props) {
-	const { items } = useFileContextMenuItems(file);
+export default function FolderContextMenu({ children, file }: Props) {
+	const { items } = useFolderContextMenuItems(file);
 
 	return (
 		<ContextMenu>
-			<ContextMenuTrigger>{children}</ContextMenuTrigger>
+			<ContextMenuTrigger className="size-full">
+				{children}
+			</ContextMenuTrigger>
 			<ContextMenuContent>
 				{items.map((item) => (
 					<ContextMenuItem key={item.key} onClick={item.onSelect}>

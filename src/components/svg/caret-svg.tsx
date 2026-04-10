@@ -1,7 +1,16 @@
-export default function CaretSvg() {
+import { cn } from "@lib/utils";
+
+interface Props {
+	className?: string;
+}
+
+const defaultClasses =
+	"animated fill-muted-foreground-alt hover:fill-muted-foreground group-hover:fill-muted-foreground";
+
+export default function CaretSvg({ className }: Props) {
 	return (
 		<svg
-			className="animated fill-muted-foreground-alt hover:fill-muted-foreground group-hover:fill-muted-foreground"
+			className={cn(defaultClasses, className)}
 			viewBox="0 0 672 667"
 			xmlns="http://www.w3.org/2000/svg"
 		>

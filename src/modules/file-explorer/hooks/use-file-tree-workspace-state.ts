@@ -1,14 +1,17 @@
 import type { Id } from "@convex/_generated/dataModel";
 import useModal, { type ModalProps } from "@hooks/use-modal";
 import useRequestConsumer from "@hooks/use-request-consumer";
-import useFilesRemove from "@modules/projects/hooks/use-files-remove";
+import { useFileEditorStore } from "@modules/file-editor/stores/use-file-editor-store";
 import type {
 	FileActionTarget,
 	FileCreateInputType,
 	FileWorkspaceRequest,
-} from "@modules/projects/stores/file-workspace.types";
-import { useFileWorkspaceRequest } from "@modules/projects/stores/use-file-workspace-request";
+} from "@modules/file-explorer/stores/file-workspace.types";
+import { useFileExplorerRequest } from "@modules/file-explorer/stores/use-file-explorer-request";
+import { useFileWorkspaceRequest } from "@modules/file-explorer/stores/use-file-workspace-request";
+import useFilesRemove from "@modules/projects/hooks/use-files-remove";
 import { useCallback, useState } from "react";
+import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 
 interface Options {
 	openRenameInput: (fileId: Id<"files">) => void;
@@ -29,7 +32,16 @@ export default function useFileTreeWorkspaceState({
 	openRenameInput,
 	openCreateInput,
 }: Options): FileTreeWorkspaceState {
+	const { preloadedResult: project } = useProjectsGetOwnedById();
+	const projectId = project?._id;
 	const request = useFileWorkspaceRequest((state) => state.request);
+	const requestSyncSelection = useFileExplorerRequest(
+		(state) => state.requestSyncSelection,
+	);
+	const requestClearSelection = useFileExplorerRequest(
+		(state) => state.requestClearSelection,
+	);
+	const closeFile = useFileEditorStore((state) => state.closeFile);
 
 	const removeFile = useFilesRemove();
 
@@ -89,7 +101,20 @@ export default function useFileTreeWorkspaceState({
 		title: `Delete ${deleteTargetLabel}`,
 		message: `This will permanently delete "${deleteTargetName}" and cannot be undone.`,
 		onConfirm: () => {
-			if (!deleteTargetFile) return;
+			if (!deleteTargetFile || !projectId) return;
+
+			if (deleteTargetFile.type === "file") {
+				const nextActiveFileId = closeFile(
+					projectId,
+					deleteTargetFile._id,
+				);
+
+				if (nextActiveFileId) {
+					requestSyncSelection(nextActiveFileId);
+				} else {
+					requestClearSelection();
+				}
+			}
 
 			void removeFile({ fileId: deleteTargetFile._id }).catch((error) => {
 				console.error("Failed to delete explorer entry", error);

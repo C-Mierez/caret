@@ -2,8 +2,8 @@ import TogglableChevron from "@components/togglable-chevron";
 import type { Doc } from "@convex/_generated/dataModel";
 import { cn } from "@lib/utils";
 import { FileIcon, FolderIcon } from "@react-symbols/icons/utils";
-import FileContextMenu from "../file-actions/file-context-menu";
-import FolderContextMenu from "../file-actions/folder-context-menu";
+import FileContextMenu from "./file-actions/file-context-menu";
+import FolderContextMenu from "./file-actions/folder-context-menu";
 import { useFileTreeContext } from "./file-tree-context";
 import { getFilePadding } from "./utils";
 
@@ -13,7 +13,8 @@ interface Props {
 }
 
 export default function FileTreeRow({ file, depth }: Props) {
-	const { activeEntryId, expandedIds, onEntryClick } = useFileTreeContext();
+	const { activeEntryId, expandedIds, onEntryClick, onEntryDoubleClick } =
+		useFileTreeContext();
 	const isActive = activeEntryId === file._id;
 	const ContextMenuWrapper =
 		file.type === "folder" ? FolderContextMenu : FileContextMenu;
@@ -23,6 +24,7 @@ export default function FileTreeRow({ file, depth }: Props) {
 			<button
 				type="button"
 				onClick={() => onEntryClick(file)}
+				onDoubleClick={() => onEntryDoubleClick(file)}
 				className={cn(
 					"flex w-max min-w-full items-end gap-1 py-1 pr-2 text-start",
 					!isActive && "hover:bg-muted",

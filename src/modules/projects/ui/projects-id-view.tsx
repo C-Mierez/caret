@@ -2,9 +2,9 @@
 
 import type { Id } from "@convex/_generated/dataModel";
 import { cn } from "@lib/utils";
+import FileEditorView from "@modules/file-editor/ui/file-editor-view";
 import { useMemo, useState } from "react";
 import { FaGithub } from "react-icons/fa";
-import EditorBase from "./components/editor/editor-base";
 
 interface TabProps {
 	label: "Code" | "Preview";
@@ -83,7 +83,7 @@ export default function ProjectsIdView({ projectId }: Props) {
 			</nav>
 			{activeTab === "Code" && (
 				<div className="min-h-0 flex-1">
-					<EditorBase />
+					<FileEditorView />
 				</div>
 			)}
 		</div>

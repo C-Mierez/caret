@@ -23,6 +23,7 @@
 
 	--spacing-header: 3rem; /* Header height. 3rem equivalent to h-12 */
 	--spacing-subheader: 2.5rem; /* Subheader height. 2.5rem equivalent to h-10 */
+	--spacing-tabs: 2rem; /* Tabs height. 2rem equivalent to h-8 */
 	--spacing-sidebar: 16rem; /* Sidebar width. 16rem equivalent to w-64 */
 
 	/* ---------------------------------- Theme --------------------------------- */
