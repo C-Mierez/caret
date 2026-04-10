@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
 import { api } from "@convex/_generated/api";
 import type { Doc } from "@convex/_generated/dataModel";
 import { DEFAULT_PROJECTS_LIMIT } from "@lib/constants";
@@ -36,28 +35,19 @@ export default function ProjectsGetOwnedInfinite({
 	initialTotalProjects,
 	children,
 }: Props) {
-	const { isLoaded, isSignedIn } = useAuth();
-	const shouldQuery = isLoaded && isSignedIn;
-
 	const paginatedResult = usePaginatedQuery(
 		api.projects.getOwnedInfinite,
-		shouldQuery ? {} : "skip",
+		{},
 		{ initialNumItems: DEFAULT_PROJECTS_LIMIT },
 	);
-	const reactiveTotalProjects = useQuery(
-		api.projects.getOwnedCount,
-		shouldQuery ? {} : "skip",
-	);
-	const totalProjects = shouldQuery
-		? (reactiveTotalProjects ?? initialTotalProjects)
-		: 0;
+	const reactiveTotalProjects = useQuery(api.projects.getOwnedCount, {});
+	const totalProjects = reactiveTotalProjects ?? initialTotalProjects;
 
-	const projects = shouldQuery
-		? paginatedResult.results.length > 0 ||
-			paginatedResult.status !== "LoadingFirstPage"
+	const projects =
+		paginatedResult.results.length > 0 ||
+		paginatedResult.status !== "LoadingFirstPage"
 			? paginatedResult.results
-			: initialData.page
-		: [];
+			: initialData.page;
 
 	const featuredProject = projects[0] ?? null;
 	const recentProjects = projects.slice(1);

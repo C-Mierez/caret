@@ -2,13 +2,12 @@ import "server-only";
 
 import { api } from "@convex/_generated/api";
 import type { Id } from "@convex/_generated/dataModel";
-import { getOrRedirectConvexToken } from "@lib/server-auth";
 import { URLs } from "@lib/urls";
 import { preloadQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
 import ProjectsGetOwnedById from "../projects-getOwnedById";
 import type { ServerComponent } from "./types";
-import { safeServerQuery } from "./utils";
+import { createProtectedDataHoc } from "./utils";
 
 interface Props {
 	params: Promise<{
@@ -16,31 +15,28 @@ interface Props {
 	}>;
 }
 
-export function withProjectsGetOwnedById<P extends object = object>(
+export function withProjectsGetOwnedById<P extends Props>(
 	Component: ServerComponent<P>,
 ) {
-	return async function WithProjectsGetOwnedById(
-		props: P extends Props ? P : never,
-	) {
-		const token = await getOrRedirectConvexToken();
-		const { projectId } = await props.params;
+	return createProtectedDataHoc<P, Awaited<ReturnType<typeof preloadQuery>>>({
+		errorMessage: "Error fetching project:",
+		getData: async (props, token) => {
+			const { projectId } = await props.params;
 
-		const project = await safeServerQuery(
-			() =>
-				preloadQuery(
-					api.projects.getOwnedById,
-					{ projectId: projectId as Id<"projects"> },
-					{ token },
-				),
-			"Error fetching project:",
-		);
+			return preloadQuery(
+				api.projects.getOwnedById,
+				{ projectId: projectId as Id<"projects"> },
+				{ token },
+			);
+		},
+		render: ({ props, data: project, Component }) => {
+			if (!project) redirect(URLs.root);
 
-		if (!project) redirect(URLs.root);
-
-		return (
-			<ProjectsGetOwnedById project={project}>
-				<Component {...props} />
-			</ProjectsGetOwnedById>
-		);
-	};
+			return (
+				<ProjectsGetOwnedById project={project}>
+					<Component {...props} />
+				</ProjectsGetOwnedById>
+			);
+		},
+	})(Component);
 }
