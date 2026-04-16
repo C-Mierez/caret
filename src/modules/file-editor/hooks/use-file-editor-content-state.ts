@@ -39,6 +39,8 @@ export default function useFileEditorContentState() {
 	const editorViewRef = useRef<EditorView | null>(null);
 	const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const isApplyingExternalContentRef = useRef(false);
+	const activeFileContentRef = useRef("");
+	const updateFileContentRef = useRef(updateFileContent);
 	const pendingSaveRef = useRef<{
 		fileId: Id<"files">;
 		content: string;
@@ -51,6 +53,14 @@ export default function useFileEditorContentState() {
 	}, [activeFileName]);
 
 	useEffect(() => {
+		activeFileContentRef.current = activeFile?.content ?? "";
+	}, [activeFile?.content]);
+
+	useEffect(() => {
+		updateFileContentRef.current = updateFileContent;
+	}, [updateFileContent]);
+
+	useEffect(() => {
 		return () => {
 			if (saveTimeoutRef.current) {
 				clearTimeout(saveTimeoutRef.current);
@@ -58,11 +68,11 @@ export default function useFileEditorContentState() {
 			}
 
 			if (pendingSaveRef.current) {
-				void updateFileContent(pendingSaveRef.current);
+				void updateFileContentRef.current(pendingSaveRef.current);
 				pendingSaveRef.current = null;
 			}
 		};
-	}, [updateFileContent]);
+	}, []);
 
 	useEffect(() => {
 		const container = editorContainerRef.current;
@@ -89,7 +99,7 @@ export default function useFileEditorContentState() {
 			saveTimeoutRef.current = setTimeout(() => {
 				if (!pendingSaveRef.current) return;
 
-				void updateFileContent(pendingSaveRef.current);
+				void updateFileContentRef.current(pendingSaveRef.current);
 				pendingSaveRef.current = null;
 				saveTimeoutRef.current = null;
 			}, 2000);
@@ -102,13 +112,13 @@ export default function useFileEditorContentState() {
 			}
 
 			if (pendingSaveRef.current?.fileId === activeFileId) {
-				void updateFileContent(pendingSaveRef.current);
+				void updateFileContentRef.current(pendingSaveRef.current);
 				pendingSaveRef.current = null;
 			}
 		};
 
 		const view = new EditorView({
-			doc: activeFile?.content ?? "",
+			doc: activeFileContentRef.current,
 			parent: container,
 			extensions: [
 				customSetup,
@@ -137,14 +147,7 @@ export default function useFileEditorContentState() {
 			editorViewRef.current = null;
 			view.destroy();
 		};
-	}, [
-		activeFile?.content,
-		activeFileId,
-		hasLoadedActiveFile,
-		languageExtension,
-		updateFileContent,
-		activeFileName,
-	]);
+	}, [activeFileId, hasLoadedActiveFile, languageExtension, activeFileName]);
 
 	useEffect(() => {
 		if (!activeFileId || activeFile === undefined) return;
@@ -166,6 +169,9 @@ export default function useFileEditorContentState() {
 
 		pendingSaveRef.current = null;
 
+		const selection = view.state.selection.main;
+		const wasFocused = view.hasFocus;
+
 		isApplyingExternalContentRef.current = true;
 		view.dispatch({
 			changes: {
@@ -173,8 +179,16 @@ export default function useFileEditorContentState() {
 				to: view.state.doc.length,
 				insert: nextContent,
 			},
+			selection: {
+				anchor: Math.min(selection.anchor, nextContent.length),
+				head: Math.min(selection.head, nextContent.length),
+			},
 		});
 		isApplyingExternalContentRef.current = false;
+
+		if (wasFocused) {
+			view.focus();
+		}
 	}, [activeFile, activeFileId]);
 
 	return {
