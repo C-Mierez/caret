@@ -24,6 +24,7 @@ Cursor-inspired clone
 - `TanStack React Form`
 - `CMDk`
 - `Allotment`
+- `KY`
 
 ### Tooling
 
