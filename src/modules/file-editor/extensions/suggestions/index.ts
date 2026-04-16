@@ -8,11 +8,12 @@ import {
 	type ViewUpdate,
 	WidgetType,
 } from "@codemirror/view";
+import { createDebouncePlugin, isWaitingForSuggestion } from "./utils";
 
 /**
  * StateEffect is the channel to send events to the editor and update the state
  */
-const setSuggestionEffect = StateEffect.define<string | null>();
+export const setSuggestionEffect = StateEffect.define<string | null>();
 
 /**
  * StateField is where the state is held and updated on different transactions.
@@ -20,7 +21,7 @@ const setSuggestionEffect = StateEffect.define<string | null>();
  */
 const suggestionState = StateField.define<string | null>({
 	create() {
-		return "// TODO Test";
+		return null; // Initial state is no suggestion
 	},
 	update(value, transaction) {
 		// Listen specifically for the setSuggestionEffect
@@ -59,6 +60,10 @@ const renderPlugin = ViewPlugin.fromClass(
 		}
 
 		build(view: EditorView) {
+			if (isWaitingForSuggestion) {
+				return Decoration.none; // Don't show any suggestion while waiting for a new one
+			}
+
 			// Get the current suggestion from the state
 			const suggestion = view.state.field(suggestionState);
 
@@ -118,5 +123,10 @@ const acceptSuggestionKeymap = keymap.of([
 ]);
 
 export function suggestion(fileName: string) {
-	return [suggestionState, renderPlugin, acceptSuggestionKeymap];
+	return [
+		suggestionState,
+		createDebouncePlugin(fileName),
+		renderPlugin,
+		acceptSuggestionKeymap,
+	];
 }
