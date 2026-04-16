@@ -13,6 +13,7 @@ import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 import { customSetup } from "../extensions/custom-setup";
 import { getLanguageExtension } from "../extensions/languages";
 import { minimap } from "../extensions/minimap";
+import { suggestion } from "../extensions/suggestions";
 import { customTheme } from "../extensions/theme";
 
 export default function useFileEditorContentState() {
@@ -114,6 +115,7 @@ export default function useFileEditorContentState() {
 				languageExtension,
 				oneDark,
 				customTheme,
+				suggestion(activeFileName),
 				keymap.of([indentWithTab]),
 				minimap(),
 				indentationMarkers(),
@@ -141,6 +143,7 @@ export default function useFileEditorContentState() {
 		hasLoadedActiveFile,
 		languageExtension,
 		updateFileContent,
+		activeFileName,
 	]);
 
 	useEffect(() => {
