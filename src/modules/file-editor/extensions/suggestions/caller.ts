@@ -15,16 +15,37 @@ export async function suggestionCaller(
 	try {
 		const validatedPayload = suggestionRequestSchema.parse(payload);
 
-		const response = await ky
-			.post("/api/ai/suggestion", {
-				json: validatedPayload,
-				signal,
-				timeout: 10_000,
-				retry: 0,
-			})
-			.json<SuggestionResponse>();
+		const response = await ky.post("/api/ai/suggestion", {
+			json: validatedPayload,
+			signal,
+			timeout: 10_000,
+			retry: 0,
+			throwHttpErrors: false,
+		});
 
-		const validatedResponse = suggestionResponseSchema.parse(response);
+		const contentType = response.headers.get("content-type") || "";
+
+		if (!response.ok) {
+			console.error("Suggestion request failed:", {
+				status: response.status,
+				statusText: response.statusText,
+			});
+			return null;
+		}
+
+		if (!contentType.includes("application/json")) {
+			console.error("Suggestion request returned non-JSON response:", {
+				contentType,
+				redirected: response.redirected,
+				url: response.url,
+			});
+			return null;
+		}
+
+		const parsedResponse = (await response.json()) as SuggestionResponse;
+
+		const validatedResponse =
+			suggestionResponseSchema.parse(parsedResponse);
 
 		return validatedResponse.suggestion;
 	} catch (err) {
