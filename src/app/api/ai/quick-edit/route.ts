@@ -1,13 +1,11 @@
 import { auth } from "@clerk/nextjs/server";
 import { google } from "@lib/google-ai";
-import { generateText, Output } from "ai";
+import { streamText } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { createAiTextStreamResponse } from "@/lib/ai-stream-server";
 import { firecrawl } from "@/lib/firecrawl";
-import {
-	quickEditRequestSchema,
-	quickEditResponseSchema,
-} from "@/lib/schemas/ai/quick-edit";
+import { quickEditRequestSchema } from "@/lib/schemas/ai/quick-edit";
 
 const URL_REGEX = /https?:\/\/[^\s)>\]]+/g;
 
@@ -38,12 +36,6 @@ If the instruction is unclear or cannot be applied, return the original code unc
 export async function POST(request: Request) {
 	try {
 		const { userId } = await auth();
-		const parsedRequest = quickEditRequestSchema
-			.extend({
-				selectedCode: z.string().min(1),
-				instruction: z.string().min(1),
-			})
-			.safeParse(await request.json());
 
 		if (!userId) {
 			return NextResponse.json(
@@ -53,6 +45,13 @@ export async function POST(request: Request) {
 				},
 			);
 		}
+
+		const parsedRequest = quickEditRequestSchema
+			.extend({
+				selectedCode: z.string().min(1),
+				instruction: z.string().min(1),
+			})
+			.safeParse(await request.json());
 
 		if (!parsedRequest.success) {
 			const selectedCodeError = parsedRequest.error.issues.some(
@@ -123,13 +122,12 @@ export async function POST(request: Request) {
 			.replace("{instruction}", instruction)
 			.replace("{documentation}", documentationContext);
 
-		const { output } = await generateText({
+		const result = streamText({
 			model: google("gemini-3.1-flash-lite-preview"),
-			output: Output.object({ schema: quickEditResponseSchema }),
 			prompt,
 		});
 
-		return NextResponse.json({ editedCode: output.editedCode });
+		return createAiTextStreamResponse(result.textStream);
 	} catch (error) {
 		console.error("Edit error:", error);
 		return NextResponse.json(

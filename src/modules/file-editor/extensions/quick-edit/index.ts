@@ -9,6 +9,7 @@ import { quickEditCaller } from "./caller";
 
 let editorView: EditorView | null = null;
 let currentAbortController: AbortController | null = null;
+let activeQuickEditRequestId = 0;
 
 export const showQuickEditEffect = StateEffect.define<boolean>();
 
@@ -74,6 +75,7 @@ function createQuickEditTooltip(state: EditorState): readonly Tooltip[] {
 				cancelButton.className =
 					"font-sans p-1 px-2 text-muted-foreground hover:text-foreground hover:bg-foreground/10 rounded-sm";
 				cancelButton.onclick = () => {
+					activeQuickEditRequestId += 1;
 					if (currentAbortController) {
 						currentAbortController.abort();
 						currentAbortController = null;
@@ -100,43 +102,73 @@ function createQuickEditTooltip(state: EditorState): readonly Tooltip[] {
 					if (!instruction) return;
 
 					const selection = editorView.state.selection.main;
+					const selectionFrom = selection.from;
+					const selectionTo = selection.to;
 					const selectedCode = editorView.state.doc.sliceString(
-						selection.from,
-						selection.to,
+						selectionFrom,
+						selectionTo,
 					);
 					const fullCode = editorView.state.doc.toString();
 
 					submitButton.disabled = true;
 					submitButton.textContent = "Editing...";
 
-					currentAbortController = new AbortController();
-					const editedCode = await quickEditCaller(
-						{
-							selectedCode,
-							fullCode,
-							instruction,
-						},
-						currentAbortController.signal,
-					);
+					const requestId = activeQuickEditRequestId + 1;
+					activeQuickEditRequestId = requestId;
 
-					if (editedCode) {
-						editorView.dispatch({
-							changes: {
-								from: selection.from,
-								to: selection.to,
-								insert: editedCode,
+					const abortController = new AbortController();
+					currentAbortController = abortController;
+
+					try {
+						const editedCode = await quickEditCaller(
+							{
+								selectedCode,
+								fullCode,
+								instruction,
 							},
-							selection: {
-								anchor: selection.from + editedCode.length,
-							},
-							effects: showQuickEditEffect.of(false),
-						});
-					} else {
-						submitButton.disabled = false;
-						submitButton.textContent = "Submit";
+							abortController.signal,
+						);
+
+						if (
+							requestId !== activeQuickEditRequestId ||
+							abortController.signal.aborted
+						) {
+							return;
+						}
+
+						if (editedCode) {
+							const currentSelectedCode =
+								editorView.state.doc.sliceString(
+									selectionFrom,
+									selectionTo,
+								);
+
+							if (currentSelectedCode !== selectedCode) {
+								submitButton.disabled = false;
+								submitButton.textContent = "Submit";
+								return;
+							}
+
+							editorView.dispatch({
+								changes: {
+									from: selectionFrom,
+									to: selectionTo,
+									insert: editedCode,
+								},
+								selection: {
+									anchor: selectionFrom + editedCode.length,
+								},
+								effects: showQuickEditEffect.of(false),
+							});
+						} else {
+							submitButton.disabled = false;
+							submitButton.textContent = "Submit";
+						}
+					} finally {
+						if (requestId === activeQuickEditRequestId) {
+							currentAbortController = null;
+						}
 					}
-
-					currentAbortController = null;
 				};
 
 				buttonContainer.appendChild(cancelButton);

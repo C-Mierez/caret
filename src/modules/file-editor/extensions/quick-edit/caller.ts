@@ -1,9 +1,8 @@
-import ky from "ky";
 import { toast } from "sonner";
 import { z } from "zod";
+import { consumeAiStream } from "@/lib/ai-stream-client";
 import {
 	type QuickEditRequest,
-	type QuickEditResponse,
 	quickEditRequestSchema,
 	quickEditResponseSchema,
 } from "@/lib/schemas/ai/quick-edit";
@@ -11,20 +10,25 @@ import {
 export async function quickEditCaller(
 	payload: QuickEditRequest,
 	signal: AbortSignal,
+	onChunk?: (editedCode: string) => void,
 ): Promise<string | null> {
 	try {
 		const validatedPayload = quickEditRequestSchema.parse(payload);
 
-		const response = await ky
-			.post("/api/ai/quick-edit", {
-				json: validatedPayload,
-				signal,
-				timeout: 10_000,
-				retry: 0,
-			})
-			.json<QuickEditResponse>();
+		const editedCode = await consumeAiStream({
+			url: "/api/ai/quick-edit",
+			payload: validatedPayload,
+			signal,
+			onChunk: (accumulated) => {
+				onChunk?.(accumulated);
+			},
+		});
 
-		const validatedResponse = quickEditResponseSchema.parse(response);
+		if (editedCode === null) {
+			return null;
+		}
+
+		const validatedResponse = quickEditResponseSchema.parse({ editedCode });
 
 		return validatedResponse.editedCode;
 	} catch (err) {

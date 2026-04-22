@@ -1,11 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { google } from "@lib/google-ai";
-import { generateText, Output } from "ai";
+import { streamText } from "ai";
 import { NextResponse } from "next/server";
-import {
-	suggestionRequestSchema,
-	suggestionResponseSchema,
-} from "@/lib/schemas/ai/suggestion";
+import { createAiTextStreamResponse } from "@/lib/ai-stream-server";
+import { suggestionRequestSchema } from "@/lib/schemas/ai/suggestion";
 
 const SUGGESTION_PROMPT = `You are a code suggestion assistant. You will be given the current line of code where the user's cursor is, and you will suggest a code completion if applicable.
 
@@ -35,6 +33,7 @@ Follow these steps IN ORDER:
 3. Only if steps 1 and 2 don't apply: suggest what should be typed at the cursor position, using context from full_code.
 
 Your suggestion is inserted immediately after the cursor, so never suggest code that's already in the file.
+Return only the suggestion text. Do not include markdown or explanations.
 </instructions>`;
 
 export async function POST(request: Request) {
@@ -96,13 +95,12 @@ export async function POST(request: Request) {
 			.replace("{nextLines}", nextLines.join("\n"))
 			.replace("{lineNumber}", lineNumber.toString());
 
-		const { output } = await generateText({
+		const result = streamText({
 			model: google("gemini-3.1-flash-lite-preview"),
-			output: Output.object({ schema: suggestionResponseSchema }),
 			prompt,
 		});
 
-		return NextResponse.json({ suggestion: output.suggestion });
+		return createAiTextStreamResponse(result.textStream);
 	} catch (err) {
 		console.error(err);
 		return NextResponse.json(

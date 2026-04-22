@@ -1,53 +1,36 @@
-import ky from "ky";
 import { toast } from "sonner";
 import { z } from "zod";
+import { consumeAiStream } from "@/lib/ai-stream-client";
 import {
 	type SuggestionRequest,
-	type SuggestionResponse,
 	suggestionRequestSchema,
 	suggestionResponseSchema,
 } from "@/lib/schemas/ai/suggestion";
 
-const SUGGESTION_REQUEST_TIMEOUT_MS = 30_000;
-
 export async function suggestionCaller(
 	payload: SuggestionRequest,
 	signal: AbortSignal,
+	onChunk?: (suggestion: string) => void,
 ): Promise<string | null> {
 	try {
 		const validatedPayload = suggestionRequestSchema.parse(payload);
 
-		const response = await ky.post("/api/ai/suggestion", {
-			json: validatedPayload,
+		const suggestion = await consumeAiStream({
+			url: "/api/ai/suggestion",
+			payload: validatedPayload,
 			signal,
-			timeout: SUGGESTION_REQUEST_TIMEOUT_MS,
-			retry: 0,
-			throwHttpErrors: false,
+			onChunk: (accumulated) => {
+				onChunk?.(accumulated);
+			},
 		});
 
-		const contentType = response.headers.get("content-type") || "";
-
-		if (!response.ok) {
-			console.error("Suggestion request failed:", {
-				status: response.status,
-				statusText: response.statusText,
-			});
+		if (suggestion === null) {
 			return null;
 		}
 
-		if (!contentType.includes("application/json")) {
-			console.error("Suggestion request returned non-JSON response:", {
-				contentType,
-				redirected: response.redirected,
-				url: response.url,
-			});
-			return null;
-		}
-
-		const parsedResponse = (await response.json()) as SuggestionResponse;
-
-		const validatedResponse =
-			suggestionResponseSchema.parse(parsedResponse);
+		const validatedResponse = suggestionResponseSchema.parse({
+			suggestion,
+		});
 
 		return validatedResponse.suggestion;
 	} catch (err) {

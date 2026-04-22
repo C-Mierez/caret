@@ -7,6 +7,7 @@ let debounceTimer: number | null = null;
 export let isWaitingForSuggestion = false;
 const DEBOUNCE_DELAY = 300;
 let currentAboutController: AbortController | null = null;
+let activeSuggestionRequestId = 0;
 
 /**
  * Mock function for testing purposes
@@ -81,6 +82,9 @@ export function createDebouncePlugin(fileName: string) {
 				if (currentAboutController !== null)
 					currentAboutController.abort();
 
+				activeSuggestionRequestId += 1;
+				const requestId = activeSuggestionRequestId;
+
 				isWaitingForSuggestion = true;
 
 				// async function generateSuggestionMock() {
@@ -103,22 +107,50 @@ export function createDebouncePlugin(fileName: string) {
 				async function generateSuggestion() {
 					const request = generateSuggestionRequest(view, fileName);
 
-					if (!request) {
-						isWaitingForSuggestion = false;
-						view.dispatch({
-							effects: setSuggestionEffect.of(null),
-						});
+					if (requestId !== activeSuggestionRequestId) {
 						return;
 					}
 
-					currentAboutController = new AbortController();
+					if (!request) {
+						if (requestId === activeSuggestionRequestId) {
+							isWaitingForSuggestion = false;
+							view.dispatch({
+								effects: setSuggestionEffect.of(null),
+							});
+						}
+						return;
+					}
+
+					const abortController = new AbortController();
+					currentAboutController = abortController;
 
 					const suggestion = await suggestionCaller(
 						request,
-						currentAboutController.signal,
+						abortController.signal,
+						(streamedSuggestion) => {
+							if (
+								requestId !== activeSuggestionRequestId ||
+								abortController.signal.aborted
+							) {
+								return;
+							}
+
+							view.dispatch({
+								effects:
+									setSuggestionEffect.of(streamedSuggestion),
+							});
+						},
 					);
 
+					if (
+						requestId !== activeSuggestionRequestId ||
+						abortController.signal.aborted
+					) {
+						return;
+					}
+
 					isWaitingForSuggestion = false;
+					currentAboutController = null;
 
 					view.dispatch({
 						effects: setSuggestionEffect.of(suggestion),
@@ -132,6 +164,7 @@ export function createDebouncePlugin(fileName: string) {
 			}
 
 			destroy() {
+				activeSuggestionRequestId += 1;
 				if (debounceTimer !== null) {
 					clearTimeout(debounceTimer);
 				}
