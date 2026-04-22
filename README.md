@@ -8,6 +8,7 @@ Cursor-inspired clone
 - `React` 
 - `TypeScript` 
 - `Tailwind CSS v4` 
+- `shadcn/ui`
 - `@t3-oss/env-nextjs`
 - `Zod`
 - `Clerk`
@@ -15,8 +16,15 @@ Cursor-inspired clone
 - [`Vercel AI SDK`](https://github.com/vercel/ai)
   - Google 
   - Anthropic
+- `Inngest`
 - `Firecrawl`
-- `Sentry` Error logging
+- `Sentry`
+- `CodeMirror`
+- `Zustand`
+- `TanStack React Form`
+- `CMDk`
+- `Allotment`
+- `KY`
 
 ### Tooling
 
