@@ -13,6 +13,8 @@ import { useProjectsGetOwnedById } from "@/hoc/projects-getOwnedById";
 import { customSetup } from "../extensions/custom-setup";
 import { getLanguageExtension } from "../extensions/languages";
 import { minimap } from "../extensions/minimap";
+import { quickEdit } from "../extensions/quick-edit";
+import { selectionTooltip } from "../extensions/selection-tooltip";
 import { suggestion } from "../extensions/suggestions";
 import { customTheme } from "../extensions/theme";
 
@@ -126,6 +128,8 @@ export default function useFileEditorContentState() {
 				oneDark,
 				customTheme,
 				suggestion(activeFileName),
+				quickEdit(),
+				selectionTooltip(),
 				keymap.of([indentWithTab]),
 				minimap(),
 				indentationMarkers(),

@@ -2,15 +2,10 @@ import { auth } from "@clerk/nextjs/server";
 import { google } from "@lib/google-ai";
 import { generateText, Output } from "ai";
 import { NextResponse } from "next/server";
-import { z } from "zod";
-
-const suggestionSchema = z.object({
-	suggestion: z
-		.string()
-		.describe(
-			"The code to be inserted at cursor position. Otherwise, empty if mp suggestion applies.",
-		),
-});
+import {
+	suggestionRequestSchema,
+	suggestionResponseSchema,
+} from "@/lib/schemas/ai/suggestion";
 
 const SUGGESTION_PROMPT = `You are a code suggestion assistant. You will be given the current line of code where the user's cursor is, and you will suggest a code completion if applicable.
 
@@ -55,6 +50,32 @@ export async function POST(request: Request) {
 			);
 		}
 
+		const parsedRequest = suggestionRequestSchema.safeParse(
+			await request.json(),
+		);
+
+		if (!parsedRequest.success) {
+			const codeError = parsedRequest.error.issues.some(
+				(issue) => issue.path[0] === "code",
+			);
+
+			if (codeError) {
+				return NextResponse.json(
+					{ error: "Code is required" },
+					{
+						status: 400,
+					},
+				);
+			}
+
+			return NextResponse.json(
+				{ error: "Invalid request body" },
+				{
+					status: 400,
+				},
+			);
+		}
+
 		const {
 			fileName,
 			code,
@@ -64,16 +85,7 @@ export async function POST(request: Request) {
 			textAfterCursor,
 			nextLines,
 			lineNumber,
-		} = await request.json();
-
-		if (!code) {
-			return NextResponse.json(
-				{ error: "Code is required" },
-				{
-					status: 400,
-				},
-			);
-		}
+		} = parsedRequest.data;
 
 		const prompt = SUGGESTION_PROMPT.replace("{fileName}", fileName)
 			.replace("{code}", code)
@@ -86,7 +98,7 @@ export async function POST(request: Request) {
 
 		const { output } = await generateText({
 			model: google("gemini-3.1-flash-lite-preview"),
-			output: Output.object({ schema: suggestionSchema }),
+			output: Output.object({ schema: suggestionResponseSchema }),
 			prompt,
 		});
 

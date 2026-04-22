@@ -1,6 +1,7 @@
 import { type EditorView, ViewPlugin, type ViewUpdate } from "@codemirror/view";
+import type { SuggestionRequest } from "@/lib/schemas/ai/suggestion";
 import { setSuggestionEffect } from ".";
-import { type SuggestionRequest, suggestionCaller } from "./caller";
+import { suggestionCaller } from "./caller";
 
 let debounceTimer: number | null = null;
 export let isWaitingForSuggestion = false;

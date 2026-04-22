@@ -1,24 +1,12 @@
 import ky from "ky";
 import { toast } from "sonner";
 import { z } from "zod";
-
-const suggestionRequestSchema = z.object({
-	fileName: z.string(),
-	code: z.string(),
-	currentLine: z.string(),
-	previousLines: z.array(z.string()),
-	textBeforeCursor: z.string(),
-	textAfterCursor: z.string(),
-	nextLines: z.array(z.string()),
-	lineNumber: z.number(),
-});
-
-const suggestionResponseSchema = z.object({
-	suggestion: z.string(),
-});
-
-export type SuggestionRequest = z.infer<typeof suggestionRequestSchema>;
-export type SuggestionResponse = z.infer<typeof suggestionResponseSchema>;
+import {
+	type SuggestionRequest,
+	type SuggestionResponse,
+	suggestionRequestSchema,
+	suggestionResponseSchema,
+} from "@/lib/schemas/ai/suggestion";
 
 export async function suggestionCaller(
 	payload: SuggestionRequest,
