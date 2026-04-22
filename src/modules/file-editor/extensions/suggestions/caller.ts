@@ -8,6 +8,8 @@ import {
 	suggestionResponseSchema,
 } from "@/lib/schemas/ai/suggestion";
 
+const SUGGESTION_REQUEST_TIMEOUT_MS = 30_000;
+
 export async function suggestionCaller(
 	payload: SuggestionRequest,
 	signal: AbortSignal,
@@ -18,7 +20,7 @@ export async function suggestionCaller(
 		const response = await ky.post("/api/ai/suggestion", {
 			json: validatedPayload,
 			signal,
-			timeout: 10_000,
+			timeout: SUGGESTION_REQUEST_TIMEOUT_MS,
 			retry: 0,
 			throwHttpErrors: false,
 		});
