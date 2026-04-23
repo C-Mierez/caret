@@ -1,5 +1,6 @@
 "use client";
 
+import ConversationPanel from "@modules/conversation/ui/conversation-panel";
 import { Allotment } from "allotment";
 import "allotment/dist/style.css";
 
@@ -8,11 +9,12 @@ const MAX_SIDEBAR_WIDTH = 800;
 const DEFAULT_CONVERSATION_SIDEBAR_WIDTH = 400;
 const DEFAULT_MAIN_SIZE = 1000;
 
-export default function AllotmentWrapper({
-	children,
-}: {
+interface Props {
+	projectId: string;
 	children: React.ReactNode;
-}) {
+}
+
+export default function AllotmentWrapper({ projectId, children }: Props) {
 	return (
 		<Allotment
 			className="w-full"
@@ -28,7 +30,7 @@ export default function AllotmentWrapper({
 				maxSize={MAX_SIDEBAR_WIDTH}
 				preferredSize={DEFAULT_CONVERSATION_SIDEBAR_WIDTH}
 			>
-				<div>Conversation Pane</div>
+				<ConversationPanel projectId={projectId} />
 			</Allotment.Pane>
 
 			<Allotment.Pane>{children}</Allotment.Pane>

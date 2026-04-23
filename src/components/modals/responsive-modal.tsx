@@ -1,7 +1,7 @@
 import { useIsMobile } from "@hooks/use-mobile";
 import type { ModalProps } from "@hooks/use-modal";
 
-import { Dialog, DialogContent } from "../ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
 
 interface ResponsiveModalProps extends ModalProps {
@@ -43,9 +43,9 @@ export default function ResponsiveModal({
 				showCloseButton={showCloseButton}
 			>
 				{!!header && (
-					<DrawerHeader>
-						<DrawerTitle>{header}</DrawerTitle>
-					</DrawerHeader>
+					<DialogHeader>
+						<DialogTitle>{header}</DialogTitle>
+					</DialogHeader>
 				)}
 				{children}
 			</DialogContent>
