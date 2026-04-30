@@ -28,15 +28,17 @@ export const getConversationById = query({
 
 export const getPendingMessages = query({
 	args: {
-		projectId: v.id("projects"),
+		conversationId: v.id("conversations"),
 	},
 	handler: async (ctx, args) => {
 		await verifyAuth(ctx);
 
 		return await ctx.db
 			.query("messages")
-			.withIndex("by_project_status", (q) =>
-				q.eq("projectId", args.projectId).eq("status", "pending"),
+			.withIndex("by_conversation_status", (q) =>
+				q
+					.eq("conversationId", args.conversationId)
+					.eq("status", "pending"),
 			)
 			.collect();
 	},
@@ -72,6 +74,7 @@ export const createMessage = mutation({
 			v.literal("pending"),
 			v.literal("sent"),
 			v.literal("failed"),
+			v.literal("cancelled"),
 		),
 	},
 	handler: async (ctx, args) => {
@@ -121,6 +124,7 @@ export const updateMessage = mutation({
 			v.literal("pending"),
 			v.literal("sent"),
 			v.literal("failed"),
+			v.literal("cancelled"),
 		),
 	},
 	handler: async (ctx, args) => {
@@ -130,5 +134,34 @@ export const updateMessage = mutation({
 			status: args.status,
 			content: args.content,
 		});
+	},
+});
+
+export const finalizePendingMessages = mutation({
+	args: {
+		conversationId: v.id("conversations"),
+		status: v.union(v.literal("failed"), v.literal("cancelled")),
+		content: v.string(),
+	},
+	handler: async (ctx, args) => {
+		await verifyAuth(ctx);
+
+		const pendingMessages = await ctx.db
+			.query("messages")
+			.withIndex("by_conversation_status", (q) =>
+				q
+					.eq("conversationId", args.conversationId)
+					.eq("status", "pending"),
+			)
+			.collect();
+
+		for (const pendingMessage of pendingMessages) {
+			await ctx.db.patch(pendingMessage._id, {
+				status: args.status,
+				content: args.content,
+			});
+		}
+
+		return { updatedCount: pendingMessages.length };
 	},
 });

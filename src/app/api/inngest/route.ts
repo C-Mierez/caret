@@ -1,9 +1,12 @@
-import { messagesSent } from "@modules/conversation/inngest/functions";
+import {
+	messagesCancelled,
+	messagesSent,
+} from "@modules/conversation/inngest/functions";
 import { serve } from "inngest/next";
 import { inngest } from "@/inngest/client";
 
 // Create an API that serves zero functions
 export const { GET, POST, PUT } = serve({
 	client: inngest,
-	functions: [messagesSent],
+	functions: [messagesCancelled, messagesSent],
 });

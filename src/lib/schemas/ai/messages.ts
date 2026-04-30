@@ -15,7 +15,7 @@ export type MessagesRequest = z.infer<typeof messagesRequestSchema>;
 export type MessagesResponse = z.infer<typeof messagesResponseSchema>;
 
 export const messagesCancelRequestSchema = z.object({
-	projectId: z.string(),
+	conversationId: z.string(),
 });
 
 export type MessagesCancelRequest = z.infer<typeof messagesCancelRequestSchema>;

@@ -8,7 +8,6 @@ const ConversationMessagesSentSchema = z.object({
 });
 
 const ConversationMessagesCancelledSchema = z.object({
-	messageId: z.string(),
 	conversationId: z.string(),
 });
 

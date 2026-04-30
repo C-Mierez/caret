@@ -73,14 +73,18 @@ export default function useConversationPanelState({ projectId }: Props) {
 	);
 
 	const handleCancel = useCallback(async () => {
+		if (!activeConversationId) {
+			return;
+		}
+
 		try {
 			await ky.post(API_URLS.messages.cancel, {
-				json: { projectId: projectId as Id<"projects"> },
+				json: { conversationId: activeConversationId },
 			});
 		} catch {
 			toast.error("Unable to cancel request");
 		}
-	}, [projectId]);
+	}, [activeConversationId]);
 
 	const createConversation = useCallback(async () => {
 		try {
