@@ -16,6 +16,7 @@ import type * as lib_hoc from "../lib/hoc.js";
 import type * as lib_types from "../lib/types.js";
 import type * as lib_utils from "../lib/utils.js";
 import type * as projects from "../projects.js";
+import type * as system from "../system.js";
 
 import type {
   ApiFromModules,
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   "lib/types": typeof lib_types;
   "lib/utils": typeof lib_utils;
   projects: typeof projects;
+  system: typeof system;
 }>;
 
 /**

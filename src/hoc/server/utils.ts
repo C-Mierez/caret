@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getOrRedirectConvexToken } from "@lib/server-auth";
+import { getOrRedirectConvexToken } from "@lib/server/server-auth";
 import { URLs } from "@lib/urls";
 import { redirect } from "next/navigation";
 import type { ServerComponent, ServerHoc } from "./types";

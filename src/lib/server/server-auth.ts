@@ -1,7 +1,7 @@
 import "server-only";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { URLs } from "./urls";
+import { URLs } from "../urls";
 
 type Props = {
 	redirectTo?: string;

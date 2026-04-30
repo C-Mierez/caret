@@ -1272,7 +1272,7 @@ export const PromptInputSubmit = ({
 			onClick={handleClick}
 			size={size}
 			type={isGenerating && onStop ? "button" : "submit"}
-			variant={variant}
+			variant={"ghost"}
 			{...props}
 		>
 			{children ?? Icon}
