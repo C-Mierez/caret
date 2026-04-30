@@ -77,6 +77,22 @@ export const createMessage = mutation({
 	handler: async (ctx, args) => {
 		await verifyAuth(ctx);
 
+		// Fetch conversation and verify projectId consistency
+		const conversation = await ctx.db.get(
+			"conversations",
+			args.conversationId,
+		);
+
+		if (!conversation) {
+			throw new createHttpError.NotFound("Conversation not found");
+		}
+
+		if (conversation.projectId !== args.projectId) {
+			throw new createHttpError.Unauthorized(
+				"Project ID does not match conversation's project",
+			);
+		}
+
 		const now = Date.now();
 
 		const messageId = await ctx.db.insert("messages", {

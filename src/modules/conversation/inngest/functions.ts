@@ -124,6 +124,7 @@ export const messagesSent = inngest.createFunction(
 					await inngest.send(
 						ConversationMessagesCancelledEvent.create({
 							messageId: message._id,
+							conversationId: event.data.conversationId as string,
 						}),
 					);
 				}),
