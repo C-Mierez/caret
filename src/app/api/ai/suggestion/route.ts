@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { google } from "@lib/google-ai";
+import { DEFAULT_GEMINI_MODEL, google } from "@lib/google-ai";
 import { streamText } from "ai";
 import { NextResponse } from "next/server";
 import { createAiTextStreamResponse } from "@/lib/ai-stream-server";
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
 			.replace("{lineNumber}", lineNumber.toString());
 
 		const result = streamText({
-			model: google("gemini-3.1-flash-lite-preview"),
+			model: google(DEFAULT_GEMINI_MODEL),
 			prompt,
 		});
 

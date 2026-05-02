@@ -11,7 +11,6 @@
 import type * as conversations from "../conversations.js";
 import type * as files from "../files.js";
 import type * as lib_auth from "../lib/auth.js";
-import type * as lib_constants from "../lib/constants.js";
 import type * as lib_hoc from "../lib/hoc.js";
 import type * as lib_types from "../lib/types.js";
 import type * as lib_utils from "../lib/utils.js";
@@ -28,7 +27,6 @@ declare const fullApi: ApiFromModules<{
   conversations: typeof conversations;
   files: typeof files;
   "lib/auth": typeof lib_auth;
-  "lib/constants": typeof lib_constants;
   "lib/hoc": typeof lib_hoc;
   "lib/types": typeof lib_types;
   "lib/utils": typeof lib_utils;
