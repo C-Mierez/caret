@@ -1,5 +1,6 @@
 import ProjectsIdLayout from "@modules/projects/ui/layouts/projects-id-layout";
 import { composeServerHocs } from "@/hoc/server/utils";
+import { withConversationsGetOwnedByProject } from "@/hoc/server/with-conversations-getOwnedByProject";
 import { withProjectsGetOwnedById } from "@/hoc/server/with-projects-getOwnedById";
 
 interface Props {
@@ -9,8 +10,14 @@ interface Props {
 	children: React.ReactNode;
 }
 
-async function Layout({ children }: Props) {
-	return <ProjectsIdLayout>{children}</ProjectsIdLayout>;
+async function Layout({ children, params }: Props) {
+	const { projectId } = await params;
+	return (
+		<ProjectsIdLayout projectId={projectId}>{children}</ProjectsIdLayout>
+	);
 }
 
-export default composeServerHocs(withProjectsGetOwnedById)(Layout);
+export default composeServerHocs(
+	withProjectsGetOwnedById,
+	withConversationsGetOwnedByProject,
+)(Layout);

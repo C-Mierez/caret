@@ -14,7 +14,8 @@
 			"!.next",
 			"!dist",
 			"!build",
-			"!convex/_generated"
+			"!convex/_generated",
+			"!src/components/ai-elements"
 		]
 	},
 	"formatter": {

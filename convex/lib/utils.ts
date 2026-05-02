@@ -3,7 +3,7 @@ import type { MutationCtx } from "@convex/_generated/server";
 import type { AuthedCtx } from "./types";
 
 export async function updateProjectTimestamp(
-	ctx: AuthedCtx<MutationCtx>,
+	ctx: AuthedCtx<MutationCtx> | MutationCtx,
 	projectId: Id<"projects">,
 	timestamp: number,
 ) {
