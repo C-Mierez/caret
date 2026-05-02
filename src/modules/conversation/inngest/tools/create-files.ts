@@ -34,7 +34,12 @@ export const createFiles = createTool({
 
 				const convexClient = await getMachineConvexClient(serviceToken);
 
-				const results: { name: string; status: string }[] = [];
+				const results: {
+					name: string;
+					status: string;
+					message?: string;
+					error?: string;
+				}[] = [];
 
 				// Group files by parentId for batch creation
 				const filesByParent = new Map<
@@ -44,12 +49,17 @@ export const createFiles = createTool({
 
 				for (const file of input.files) {
 					const key = file.parentId;
-					if (!filesByParent.has(key)) {
-						filesByParent.set(key, []);
+					const filesInParent = filesByParent.get(key);
+					if (filesInParent) {
+						filesInParent.push({
+							name: file.name,
+							content: file.content,
+						});
+					} else {
+						filesByParent.set(key, [
+							{ name: file.name, content: file.content },
+						]);
 					}
-					filesByParent
-						.get(key)!
-						.push({ name: file.name, content: file.content });
 				}
 
 				// Create files in batches by parent folder
@@ -70,22 +80,29 @@ export const createFiles = createTool({
 							});
 						}
 					} catch (e) {
+						const message =
+							e instanceof Error ? e.message : String(e);
 						for (const file of groupedFiles) {
 							results.push({
 								name: file.name,
-								status: `error: ${e instanceof Error ? e.message : String(e)}`,
+								status: "error",
+								message,
+								error: message,
 							});
 						}
 					}
 				}
 
 				if (results.every((r) => r.status !== "created")) {
-					return "Error: Failed to create any files. Check the error messages and try again.";
+					return {
+						filesCreated: results,
+						error: "Failed to create any files. Check the error messages and try again.",
+					};
 				}
 
-				return JSON.stringify({
+				return {
 					filesCreated: results,
-				});
+				};
 			});
 		} catch (e) {
 			return `Error creating files: ${e instanceof Error ? e.message : String(e)}`;

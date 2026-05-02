@@ -38,10 +38,10 @@ export const getRecentMessages = query({
 			.withIndex("by_conversation", (q) =>
 				q.eq("conversationId", args.conversationId),
 			)
-			.order("asc")
+			.order("desc")
 			.take(args.limit ?? 10);
 
-		return messages;
+		return messages.reverse();
 	},
 });
 
@@ -322,11 +322,7 @@ export const createFile = mutation({
 			)
 			.collect();
 
-		if (
-			existingFiles.some(
-				(file) => file.name === args.name && file.type === "file",
-			)
-		) {
+		if (existingFiles.some((file) => file.name === args.name)) {
 			throw new createHttpError.Conflict(
 				`A file named "${args.name}" already exists in this folder.`,
 			);
@@ -426,7 +422,7 @@ export const createFolder = mutation({
 	handler: async (ctx, args) => {
 		await verifyAuth(ctx);
 
-		// Verify no folder repeats in the same folder
+		// Verify no sibling repeats in the same folder
 		const existingFiles = await ctx.db
 			.query("files")
 			.withIndex("by_project_and_parent", (q) =>
@@ -434,11 +430,7 @@ export const createFolder = mutation({
 			)
 			.collect();
 
-		if (
-			existingFiles.some(
-				(file) => file.name === args.name && file.type === "folder",
-			)
-		) {
+		if (existingFiles.some((file) => file.name === args.name)) {
 			throw new createHttpError.Conflict(
 				`A file named "${args.name}" already exists in this folder.`,
 			);

@@ -31,12 +31,23 @@ export const readFiles = createTool({
 				const convexClient = await getMachineConvexClient(serviceToken);
 
 				for (const fileId of input.fileIds) {
-					const file = await convexClient.query(
-						api.system.getFileById,
-						{ fileId: fileId as Id<"files"> },
-					);
+					let file:
+						| {
+								name: string;
+								content?: string;
+						  }
+						| undefined;
 
-					if (file?.content) {
+					try {
+						file = await convexClient.query(
+							api.system.getFileById,
+							{ fileId: fileId as Id<"files"> },
+						);
+					} catch {
+						continue;
+					}
+
+					if (file?.content !== undefined) {
 						results.push({
 							id: fileId,
 							name: file.name,

@@ -188,7 +188,7 @@ export const messagesSent = inngest.createFunction(
 			return systemPrompt;
 		});
 
-		const buildConversationTitle = (async () => {
+		const buildConversationTitle = step.run("generate title", async () => {
 			if (conversation.title !== DEFAULT_CONVERSATION_TITLE) {
 				return;
 			}
@@ -247,7 +247,7 @@ export const messagesSent = inngest.createFunction(
 				console.warn("Failed to generate conversation title", error);
 				return;
 			}
-		})();
+		});
 
 		const [_systemPrompt, newTitle] = await Promise.all([
 			buildSystemPrompt,

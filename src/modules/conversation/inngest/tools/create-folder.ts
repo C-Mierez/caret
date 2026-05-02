@@ -27,16 +27,20 @@ export const createFolder = createTool({
 
 				const convexClient = await getMachineConvexClient(serviceToken);
 
-				await convexClient.mutation(api.system.createFolder, {
-					name: input.name,
-					projectId: input.projectId as Id<"projects">,
-					parentId: input.parentId
-						? (input.parentId as Id<"files">)
-						: undefined,
-				});
+				const folderId = await convexClient.mutation(
+					api.system.createFolder,
+					{
+						name: input.name,
+						projectId: input.projectId as Id<"projects">,
+						parentId: input.parentId
+							? (input.parentId as Id<"files">)
+							: undefined,
+					},
+				);
 
 				return JSON.stringify({
 					folderName: input.name,
+					folderId,
 					status: "created",
 				});
 			});

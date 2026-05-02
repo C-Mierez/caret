@@ -2,15 +2,26 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
+const agentKitDist = path.join(
+	root,
+	"node_modules",
+	"@inngest",
+	"agent-kit",
+	"dist",
+);
+const chunkFileName = fs
+	.readdirSync(agentKitDist)
+	.find((entry) => /^chunk-.*\.js$/.test(entry));
+
+if (!chunkFileName) {
+	console.error(
+		`Could not find an @inngest/agent-kit chunk in ${agentKitDist}`,
+	);
+	process.exit(1);
+}
+
 const targets = [
-	path.join(
-		root,
-		"node_modules",
-		"@inngest",
-		"agent-kit",
-		"dist",
-		"chunk-BSWKEFTT.js",
-	),
+	path.join(agentKitDist, chunkFileName),
 	path.join(
 		root,
 		"node_modules",
