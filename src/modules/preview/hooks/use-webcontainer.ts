@@ -46,11 +46,19 @@ export function useWebContainer({ projectId, enabled, settings }: Props) {
 
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
-	const [restartKey, setRestartKey] = useState<number>(0);
+	const [_restartKey, setRestartKey] = useState<number>(0);
 	const [terminalOutput, setTerminalOutput] = useState<string>("");
 
 	const containerRef = useRef<WebContainer | null>(null);
 	const hasStartedRef = useRef(false);
+	const isMountedRef = useRef(true);
+
+	useEffect(() => {
+		isMountedRef.current = true;
+		return () => {
+			isMountedRef.current = false;
+		};
+	}, []);
 
 	// Fetch the files
 	// Since this is convex, files will auto-update on changes
@@ -62,17 +70,19 @@ export function useWebContainer({ projectId, enabled, settings }: Props) {
 			return;
 		}
 
-		hasStartedRef.current = true;
-
 		async function start() {
+			// mark started here so failures still allow explicit restarts
+			hasStartedRef.current = true;
+
 			try {
-				setStatus("booting");
-				setError(null);
-				setTerminalOutput("");
+				if (isMountedRef.current) setStatus("booting");
+				if (isMountedRef.current) setError(null);
+				if (isMountedRef.current) setTerminalOutput("");
 
 				if (!files) throw new Error("No files found for the project");
 
 				function appendTerminalOutput(data: string) {
+					if (!isMountedRef.current) return;
 					setTerminalOutput((prev) => prev + data);
 				}
 
@@ -84,6 +94,7 @@ export function useWebContainer({ projectId, enabled, settings }: Props) {
 				setStatus("installing");
 
 				container.on("server-ready", (_port, url) => {
+					if (!isMountedRef.current) return;
 					setPreviewUrl(url);
 					setStatus("running");
 				});
@@ -127,8 +138,29 @@ export function useWebContainer({ projectId, enabled, settings }: Props) {
 						},
 					}),
 				);
-			} catch (err) {
-				setError("Failed to boot web container");
+			} catch (rawErr) {
+				const err =
+					rawErr instanceof Error
+						? rawErr
+						: new Error(String(rawErr));
+				// expose the error message to the central UI and terminal for debugging
+				if (isMountedRef.current)
+					setError(`Failed to boot web container: ${err.message}`);
+				if (isMountedRef.current)
+					setTerminalOutput(
+						(prev) =>
+							prev +
+							`\n[webcontainer error] ${err.message}\n${err.stack || ""}\n`,
+					);
+				// ensure the container instance is cleaned up in case of partial boot
+				try {
+					await cleanupWebContainer();
+				} catch (_cleanupErr) {
+					// ignore cleanup errors
+				}
+				// allow explicit restart attempts
+				hasStartedRef.current = false;
+				console.error(err);
 			}
 		}
 
@@ -168,16 +200,14 @@ export function useWebContainer({ projectId, enabled, settings }: Props) {
 
 	// Restart the container when the restart key changes
 	const restart = useCallback(() => {
-		if (restartKey === 0) return; // Skip on initial load
-
 		cleanupWebContainer();
 		hasStartedRef.current = false;
 		containerRef.current = null;
 		setStatus("idle");
 		setPreviewUrl(null);
 		setError(null);
-		setRestartKey((k) => k + 1); // Increment to trigger restart
-	}, [restartKey]);
+		setRestartKey((k) => k + 1);
+	}, []);
 
 	return {
 		status,

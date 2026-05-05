@@ -6,7 +6,7 @@ import { useWebContainer } from "./use-webcontainer";
 export default function usePreviewViewState() {
 	const { preloadedResult: project } = useProjectsGetOwnedById();
 
-	const { isOpen: isTerminalOpen, toggle: toggleTerminal } = useToggle();
+	const { isOpen: isTerminalOpen, toggle: toggleTerminal } = useToggle(true);
 
 	const { status, error, previewUrl, restart, terminalOutput } =
 		useWebContainer({

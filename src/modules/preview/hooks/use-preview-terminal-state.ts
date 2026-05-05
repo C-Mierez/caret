@@ -11,7 +11,7 @@ export default function usePreviewTerminalState(output: string) {
 	// Initialize terminal
 	// biome-ignore lint/correctness/useExhaustiveDependencies: We only want to run this effect once on mount
 	useEffect(() => {
-		if (!containerRef.current || !terminalRef.current) return;
+		if (!containerRef.current || terminalRef.current) return;
 
 		const terminal = new Terminal({
 			convertEol: true,
@@ -20,6 +20,7 @@ export default function usePreviewTerminalState(output: string) {
 			fontFamily: '"JetBrains Mono", monospace',
 			theme: {
 				background: "#14171d",
+				foreground: "#d8dee9",
 			},
 		});
 
@@ -38,18 +39,20 @@ export default function usePreviewTerminalState(output: string) {
 		}
 
 		// Request animation frame to fit the terminal after it has been rendered
-		requestAnimationFrame(() => {
-			fitAddon.fit();
+		const rafId = requestAnimationFrame(() => {
+			if (fitAddonRef.current) fitAddonRef.current.fit();
 		});
 
 		// Resizable observer to fit terminal on container resize
 		const resizeObserver = new ResizeObserver(() => {
-			fitAddon.fit();
+			if (fitAddonRef.current) fitAddonRef.current.fit();
 		});
-		resizeObserver.observe(containerRef.current);
+		if (containerRef.current) resizeObserver.observe(containerRef.current);
 
 		return () => {
 			resizeObserver.disconnect();
+			if (typeof cancelAnimationFrame !== "undefined")
+				cancelAnimationFrame(rafId);
 			terminal.dispose();
 			terminalRef.current = null;
 			fitAddonRef.current = null;

@@ -1,4 +1,4 @@
-const { generateKeyPairSync } = require("crypto");
+const { generateKeyPairSync } = require("node:crypto");
 
 const { privateKey, publicKey } = generateKeyPairSync("ec", {
 	namedCurve: "prime256v1",
@@ -11,10 +11,10 @@ console.log("PRIVATE KEY (for .env):", privateKey);
 console.log("PUBLIC KEY (for .env):", publicKey);
 
 // Convert public key to JWK format
-const { createPublicKey } = require("crypto");
+const { createPublicKey } = require("node:crypto");
 const pubKey = createPublicKey(publicKey);
 const jwk = pubKey.export({ format: "jwk" });
-const { createPrivateKey } = require("crypto");
+const { createPrivateKey } = require("node:crypto");
 const privKey = createPrivateKey(privateKey);
 const privateJwk = privKey.export({ format: "jwk" });
 
