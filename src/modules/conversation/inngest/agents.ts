@@ -58,7 +58,7 @@ export function createCodingAgentNetwork(
 	return createNetwork({
 		name: "Coding Agent Network",
 		agents: [codingAgent],
-		maxIter: 15,
+		maxIter: 30,
 		router: ({ network }) => {
 			const lastResult = network.state.results.at(-1);
 
