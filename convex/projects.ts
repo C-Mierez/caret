@@ -86,3 +86,33 @@ export const rename = mutation({
 		},
 	),
 });
+
+export const updateSettings = mutation({
+	args: {
+		projectId: v.id("projects"),
+		settings: v.object({
+			installCommand: v.optional(v.string()),
+			devCommand: v.optional(v.string()),
+		}),
+	},
+	handler: withAuth(
+		async (
+			ctx,
+			args: {
+				projectId: Id<"projects">;
+				settings: {
+					installCommand?: string;
+					devCommand?: string;
+				};
+			},
+		) => {
+			await verifyProjectOwnership(ctx, args.projectId);
+
+			// Wont throw since project is verified already
+			await ctx.db.patch("projects", args.projectId, {
+				settings: args.settings,
+				updated_at: Date.now(),
+			});
+		},
+	),
+});
