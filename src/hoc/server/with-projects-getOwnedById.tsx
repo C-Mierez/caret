@@ -24,7 +24,7 @@ export function withProjectsGetOwnedById<P extends Props>(
 			const { projectId } = await props.params;
 
 			return preloadQuery(
-				api.projects.getOwnedById,
+				api.user.projects.getOwnedById,
 				{ projectId: projectId as Id<"projects"> },
 				{ token },
 			);

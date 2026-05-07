@@ -27,7 +27,7 @@ export const listFiles = createTool({
 				const convexClient = await getMachineConvexClient(serviceToken);
 
 				const files = await convexClient.query(
-					api.system.getOwnedSorted,
+					api.system.files.getOwnedSorted,
 					{
 						projectId: input.projectId as Id<"projects">,
 						parentId: input.parentId

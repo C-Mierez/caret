@@ -13,7 +13,7 @@ import { createContext, useContext } from "react";
 
 interface ProjectsDataContextType {
 	paginatedResult: UsePaginatedQueryReturnType<
-		typeof api.projects.getOwnedInfinite
+		typeof api.user.projects.getOwnedInfinite
 	>;
 	totalProjects: number;
 	featuredProject: Doc<"projects"> | null;
@@ -36,11 +36,11 @@ export default function ProjectsGetOwnedInfinite({
 	children,
 }: Props) {
 	const paginatedResult = usePaginatedQuery(
-		api.projects.getOwnedInfinite,
+		api.user.projects.getOwnedInfinite,
 		{},
 		{ initialNumItems: DEFAULT_PROJECTS_LIMIT },
 	);
-	const reactiveTotalProjects = useQuery(api.projects.getOwnedCount, {});
+	const reactiveTotalProjects = useQuery(api.user.projects.getOwnedCount, {});
 	const totalProjects = reactiveTotalProjects ?? initialTotalProjects;
 
 	const projects =

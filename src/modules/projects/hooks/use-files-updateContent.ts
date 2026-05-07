@@ -6,16 +6,16 @@ import { optimisticUpdateFileContentCache } from "./optimistic-update-cache";
 
 export default function useFilesUpdateContent() {
 	const setSaving = useSaveState((state) => state.setSaving);
-	const mutation = useMutation(api.files.updateContent).withOptimisticUpdate(
-		(localStore, args) => {
-			optimisticUpdateFileContentCache(
-				localStore,
-				args.fileId,
-				args.content,
-				Date.now(),
-			);
-		},
-	);
+	const mutation = useMutation(
+		api.user.files.updateContent,
+	).withOptimisticUpdate((localStore, args) => {
+		optimisticUpdateFileContentCache(
+			localStore,
+			args.fileId,
+			args.content,
+			Date.now(),
+		);
+	});
 
 	return useCallback(
 		async (args: Parameters<typeof mutation>[0]) => {

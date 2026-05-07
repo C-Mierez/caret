@@ -24,11 +24,14 @@ async function finalizeConversationMessages(options: {
 }) {
 	const convexClient = await getMachineConvexClient(options.serviceToken);
 
-	return await convexClient.mutation(api.system.finalizePendingMessages, {
-		conversationId: options.conversationId as Id<"conversations">,
-		status: options.status,
-		content: options.content,
-	});
+	return await convexClient.mutation(
+		api.system.conversations.finalizePendingMessages,
+		{
+			conversationId: options.conversationId as Id<"conversations">,
+			status: options.status,
+			content: options.content,
+		},
+	);
 }
 
 export const messagesCancelled = inngest.createFunction(
@@ -110,7 +113,7 @@ export const messagesSent = inngest.createFunction(
 			const convexClient = await getMachineConvexClient(serviceToken);
 
 			const conversation = await convexClient.query(
-				api.system.getConversationById,
+				api.system.conversations.getConversationById,
 				{
 					conversationId: event.data
 						.conversationId as Id<"conversations">,
@@ -141,27 +144,35 @@ export const messagesSent = inngest.createFunction(
 				// Create a use message for the conversation
 				const [userMessageId, assistantMessageId, recentMessages] =
 					await Promise.all([
-						convexClient.mutation(api.system.createMessage, {
-							content: event.data.message,
-							conversationId: event.data
-								.conversationId as Id<"conversations">,
-							projectId: conversation.projectId,
-							sender: "user",
-							status: "sent",
-						}),
-						convexClient.mutation(api.system.createMessage, {
-							content: "",
-							conversationId: event.data
-								.conversationId as Id<"conversations">,
-							projectId: conversation.projectId,
-							sender: "assistant",
-							status: "pending",
-						}),
-						convexClient.query(api.system.getRecentMessages, {
-							conversationId: event.data
-								.conversationId as Id<"conversations">,
-							limit: 10,
-						}),
+						convexClient.mutation(
+							api.system.conversations.createMessage,
+							{
+								content: event.data.message,
+								conversationId: event.data
+									.conversationId as Id<"conversations">,
+								projectId: conversation.projectId,
+								sender: "user",
+								status: "sent",
+							},
+						),
+						convexClient.mutation(
+							api.system.conversations.createMessage,
+							{
+								conversationId: event.data
+									.conversationId as Id<"conversations">,
+								projectId: conversation.projectId,
+								sender: "assistant",
+								status: "pending",
+							},
+						),
+						convexClient.query(
+							api.system.conversations.getRecentMessages,
+							{
+								conversationId: event.data
+									.conversationId as Id<"conversations">,
+								limit: 10,
+							},
+						),
 					]);
 
 				return { userMessageId, assistantMessageId, recentMessages };
@@ -291,11 +302,14 @@ export const messagesSent = inngest.createFunction(
 		await step.run("update-assistant-message", async () => {
 			const convexClient = await getMachineConvexClient(serviceToken);
 
-			await convexClient.mutation(api.system.updateMessage, {
-				messageId: assistantMessageId as Id<"messages">,
-				content: assistantResponse,
-				status: "sent",
-			});
+			await convexClient.mutation(
+				api.system.conversations.updateMessage,
+				{
+					messageId: assistantMessageId as Id<"messages">,
+					content: assistantResponse,
+					status: "sent",
+				},
+			);
 		});
 
 		// Await title generation now that the main assistant processing is
@@ -309,7 +323,7 @@ export const messagesSent = inngest.createFunction(
 				const convexClient = await getMachineConvexClient(serviceToken);
 
 				await convexClient.mutation(
-					api.system.updateConversationTitle,
+					api.system.conversations.updateConversationTitle,
 					{
 						conversationId: event.data
 							.conversationId as Id<"conversations">,

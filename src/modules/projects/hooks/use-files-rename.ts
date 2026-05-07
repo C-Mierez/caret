@@ -3,7 +3,7 @@ import { useMutation } from "convex/react";
 import { optimisticRenameFileCache } from "./optimistic-update-cache";
 
 export default function useFilesRename() {
-	return useMutation(api.files.rename).withOptimisticUpdate(
+	return useMutation(api.user.files.rename).withOptimisticUpdate(
 		(localStore, args) => {
 			optimisticRenameFileCache(
 				localStore,

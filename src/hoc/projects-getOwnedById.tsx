@@ -14,7 +14,7 @@ const ProjectsDataContext = createContext<ProjectsDataContextType | undefined>(
 );
 
 interface Props {
-	project: Preloaded<typeof api.projects.getOwnedById>;
+	project: Preloaded<typeof api.user.projects.getOwnedById>;
 	children: React.ReactNode;
 }
 

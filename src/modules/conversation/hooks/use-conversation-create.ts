@@ -3,7 +3,7 @@ import type { Doc, Id } from "@convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 
 export default function useConversationCreate() {
-	return useMutation(api.conversations.create).withOptimisticUpdate(
+	return useMutation(api.user.conversations.create).withOptimisticUpdate(
 		(localStore, args) => {
 			const now = Date.now();
 			const newConversation = {
@@ -15,13 +15,13 @@ export default function useConversationCreate() {
 			} satisfies Doc<"conversations">;
 
 			const cachedQuery = localStore.getQuery(
-				api.conversations.getOwnedByProject,
+				api.user.conversations.getOwnedByProject,
 				{ projectId: args.projectId },
 			);
 
 			if (cachedQuery !== undefined) {
 				localStore.setQuery(
-					api.conversations.getOwnedByProject,
+					api.user.conversations.getOwnedByProject,
 					{ projectId: args.projectId },
 					[newConversation, ...cachedQuery],
 				);

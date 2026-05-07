@@ -18,13 +18,16 @@ export function optimisticUpdateProjectSettingsCache(
 	},
 	updatedAt: number,
 ) {
-	const cachedProjectById = localStore.getQuery(api.projects.getOwnedById, {
-		projectId,
-	});
+	const cachedProjectById = localStore.getQuery(
+		api.user.projects.getOwnedById,
+		{
+			projectId,
+		},
+	);
 
 	if (cachedProjectById !== undefined && cachedProjectById !== null) {
 		localStore.setQuery(
-			api.projects.getOwnedById,
+			api.user.projects.getOwnedById,
 			{ projectId },
 			{
 				...cachedProjectById,
@@ -35,7 +38,7 @@ export function optimisticUpdateProjectSettingsCache(
 	}
 
 	for (const cachedQuery of localStore.getAllQueries(
-		api.projects.getOwnedInfinite,
+		api.user.projects.getOwnedInfinite,
 	)) {
 		if (cachedQuery.value === undefined) {
 			continue;
@@ -51,16 +54,23 @@ export function optimisticUpdateProjectSettingsCache(
 				: project,
 		);
 
-		localStore.setQuery(api.projects.getOwnedInfinite, cachedQuery.args, {
-			...cachedQuery.value,
-			page: updatedProjects,
-		});
+		localStore.setQuery(
+			api.user.projects.getOwnedInfinite,
+			cachedQuery.args,
+			{
+				...cachedQuery.value,
+				page: updatedProjects,
+			},
+		);
 	}
 
-	const cachedProjects = localStore.getQuery(api.projects.getOwnedAll, {});
+	const cachedProjects = localStore.getQuery(
+		api.user.projects.getOwnedAll,
+		{},
+	);
 	if (cachedProjects !== undefined) {
 		localStore.setQuery(
-			api.projects.getOwnedAll,
+			api.user.projects.getOwnedAll,
 			{},
 			cachedProjects.map((project) =>
 				project._id === projectId
@@ -86,7 +96,7 @@ export function optimisticUpdateFileCache(
 	parentId: Id<"files"> | undefined,
 ) {
 	// Update getOwnedSorted cache for the specific parent
-	const cachedQuery = localStore.getQuery(api.files.getOwnedSorted, {
+	const cachedQuery = localStore.getQuery(api.user.files.getOwnedSorted, {
 		projectId,
 		parentId,
 	});
@@ -96,19 +106,22 @@ export function optimisticUpdateFileCache(
 			sortFilesByTypeAndName,
 		);
 		localStore.setQuery(
-			api.files.getOwnedSorted,
+			api.user.files.getOwnedSorted,
 			{ projectId, parentId },
 			sortedFiles,
 		);
 	}
 
 	// Update getOwnedAll cache for the project
-	const allFilesCachedQuery = localStore.getQuery(api.files.getOwnedAll, {
-		projectId,
-	});
+	const allFilesCachedQuery = localStore.getQuery(
+		api.user.files.getOwnedAll,
+		{
+			projectId,
+		},
+	);
 
 	if (allFilesCachedQuery !== undefined) {
-		localStore.setQuery(api.files.getOwnedAll, { projectId }, [
+		localStore.setQuery(api.user.files.getOwnedAll, { projectId }, [
 			...allFilesCachedQuery,
 			newItem,
 		]);
@@ -122,7 +135,7 @@ export function optimisticRenameFileCache(
 	updatedAt: number,
 ) {
 	for (const cachedQuery of localStore.getAllQueries(
-		api.files.getOwnedSorted,
+		api.user.files.getOwnedSorted,
 	)) {
 		if (cachedQuery.value === undefined) {
 			continue;
@@ -140,14 +153,16 @@ export function optimisticRenameFileCache(
 
 		if (updatedFiles !== cachedQuery.value) {
 			localStore.setQuery(
-				api.files.getOwnedSorted,
+				api.user.files.getOwnedSorted,
 				cachedQuery.args,
 				updatedFiles.sort(sortFilesByTypeAndName),
 			);
 		}
 	}
 
-	for (const cachedQuery of localStore.getAllQueries(api.files.getOwnedAll)) {
+	for (const cachedQuery of localStore.getAllQueries(
+		api.user.files.getOwnedAll,
+	)) {
 		if (cachedQuery.value === undefined) {
 			continue;
 		}
@@ -164,7 +179,7 @@ export function optimisticRenameFileCache(
 
 		if (updatedFiles !== cachedQuery.value) {
 			localStore.setQuery(
-				api.files.getOwnedAll,
+				api.user.files.getOwnedAll,
 				cachedQuery.args,
 				updatedFiles,
 			);
@@ -178,13 +193,13 @@ export function optimisticUpdateFileContentCache(
 	content: string,
 	updatedAt: number,
 ) {
-	const cachedFileById = localStore.getQuery(api.files.getOwnedById, {
+	const cachedFileById = localStore.getQuery(api.user.files.getOwnedById, {
 		fileId,
 	});
 
 	if (cachedFileById !== undefined && cachedFileById.type === "file") {
 		localStore.setQuery(
-			api.files.getOwnedById,
+			api.user.files.getOwnedById,
 			{ fileId },
 			{
 				...cachedFileById,
@@ -194,40 +209,8 @@ export function optimisticUpdateFileContentCache(
 		);
 	}
 
-	for (const cachedQuery of localStore.getAllQueries(api.files.getOwnedAll)) {
-		if (cachedQuery.value === undefined) {
-			continue;
-		}
-
-		let didUpdate = false;
-		const updatedFiles = cachedQuery.value.map((file) =>
-			file._id === fileId && file.type === "file"
-				? {
-						...file,
-						content,
-						updatedAt,
-					}
-				: file,
-		);
-
-		for (const file of cachedQuery.value) {
-			if (file._id === fileId && file.type === "file") {
-				didUpdate = true;
-				break;
-			}
-		}
-
-		if (didUpdate) {
-			localStore.setQuery(
-				api.files.getOwnedAll,
-				cachedQuery.args,
-				updatedFiles,
-			);
-		}
-	}
-
 	for (const cachedQuery of localStore.getAllQueries(
-		api.files.getOwnedSorted,
+		api.user.files.getOwnedAll,
 	)) {
 		if (cachedQuery.value === undefined) {
 			continue;
@@ -253,7 +236,41 @@ export function optimisticUpdateFileContentCache(
 
 		if (didUpdate) {
 			localStore.setQuery(
-				api.files.getOwnedSorted,
+				api.user.files.getOwnedAll,
+				cachedQuery.args,
+				updatedFiles,
+			);
+		}
+	}
+
+	for (const cachedQuery of localStore.getAllQueries(
+		api.user.files.getOwnedSorted,
+	)) {
+		if (cachedQuery.value === undefined) {
+			continue;
+		}
+
+		let didUpdate = false;
+		const updatedFiles = cachedQuery.value.map((file) =>
+			file._id === fileId && file.type === "file"
+				? {
+						...file,
+						content,
+						updatedAt,
+					}
+				: file,
+		);
+
+		for (const file of cachedQuery.value) {
+			if (file._id === fileId && file.type === "file") {
+				didUpdate = true;
+				break;
+			}
+		}
+
+		if (didUpdate) {
+			localStore.setQuery(
+				api.user.files.getOwnedSorted,
 				cachedQuery.args,
 				updatedFiles,
 			);
@@ -268,7 +285,7 @@ export function optimisticRemoveFileCache(
 	const filesByParentId = new Map<Id<"files"> | undefined, Doc<"files">[]>();
 
 	for (const cachedQuery of localStore.getAllQueries(
-		api.files.getOwnedSorted,
+		api.user.files.getOwnedSorted,
 	)) {
 		if (cachedQuery.value === undefined) {
 			continue;
@@ -297,7 +314,7 @@ export function optimisticRemoveFileCache(
 	}
 
 	for (const cachedQuery of localStore.getAllQueries(
-		api.files.getOwnedSorted,
+		api.user.files.getOwnedSorted,
 	)) {
 		if (cachedQuery.value === undefined) {
 			continue;
@@ -309,14 +326,16 @@ export function optimisticRemoveFileCache(
 
 		if (updatedFiles.length !== cachedQuery.value.length) {
 			localStore.setQuery(
-				api.files.getOwnedSorted,
+				api.user.files.getOwnedSorted,
 				cachedQuery.args,
 				updatedFiles,
 			);
 		}
 	}
 
-	for (const cachedQuery of localStore.getAllQueries(api.files.getOwnedAll)) {
+	for (const cachedQuery of localStore.getAllQueries(
+		api.user.files.getOwnedAll,
+	)) {
 		if (cachedQuery.value === undefined) {
 			continue;
 		}
@@ -327,7 +346,7 @@ export function optimisticRemoveFileCache(
 
 		if (updatedFiles.length !== cachedQuery.value.length) {
 			localStore.setQuery(
-				api.files.getOwnedAll,
+				api.user.files.getOwnedAll,
 				cachedQuery.args,
 				updatedFiles,
 			);

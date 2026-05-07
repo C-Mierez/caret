@@ -1,10 +1,10 @@
 import type { PaginationOptions } from "convex/server";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
-import { verifyProjectOwnership } from "./lib/auth";
-import { withAuth } from "./lib/hoc";
+import type { Id } from "../_generated/dataModel";
+import { mutation, query } from "../_generated/server";
+import { verifyProjectOwnership } from "../lib/auth";
+import { withAuth } from "../lib/hoc";
 
 export const create = mutation({
 	args: {

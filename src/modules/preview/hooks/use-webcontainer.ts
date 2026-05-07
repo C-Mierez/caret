@@ -132,7 +132,7 @@ export function useWebContainer({ projectId, enabled, settings }: Props) {
 
 	// Fetch the files
 	// Since this is convex, files will auto-update on changes
-	const files = useQuery(api.files.getOwnedAll, { projectId });
+	const files = useQuery(api.user.files.getOwnedAll, { projectId });
 
 	// Mount
 	// biome-ignore lint/correctness/useExhaustiveDependencies: ...

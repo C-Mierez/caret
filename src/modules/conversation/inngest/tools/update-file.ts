@@ -26,10 +26,13 @@ export const updateFile = createTool({
 
 				const convexClient = await getMachineConvexClient(serviceToken);
 
-				await convexClient.mutation(api.system.updateFileContent, {
-					fileId: input.fileId as Id<"files">,
-					content: input.content,
-				});
+				await convexClient.mutation(
+					api.system.files.updateFileContent,
+					{
+						fileId: input.fileId as Id<"files">,
+						content: input.content,
+					},
+				);
 
 				return JSON.stringify({
 					fileId: input.fileId,

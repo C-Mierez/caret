@@ -37,7 +37,7 @@ export default function useFileTreeState() {
 	const editorOpenFile = useFileEditorStore((state) => state.openFile);
 
 	const activePath = useQuery(
-		api.files.getOwnedPathToRoot,
+		api.user.files.getOwnedPathToRoot,
 		projectId && activeEntryId
 			? {
 					fileId: activeEntryId,
@@ -46,7 +46,7 @@ export default function useFileTreeState() {
 	);
 
 	const syncTargetPath = useQuery(
-		api.files.getOwnedPathToRoot,
+		api.user.files.getOwnedPathToRoot,
 		projectId && syncTargetId
 			? {
 					fileId: syncTargetId,

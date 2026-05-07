@@ -1,9 +1,9 @@
 import { v } from "convex/values";
 import createHttpError from "http-errors";
-import type { Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
-import { verifyProjectOwnership } from "./lib/auth";
-import { withAuth } from "./lib/hoc";
+import type { Id } from "../_generated/dataModel";
+import { mutation, query } from "../_generated/server";
+import { verifyProjectOwnership } from "../lib/auth";
+import { withAuth } from "../lib/hoc";
 
 export const getOwnedById = query({
 	args: {

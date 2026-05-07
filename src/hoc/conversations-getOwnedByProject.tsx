@@ -14,7 +14,9 @@ const ConversationsDataContext = createContext<
 >(undefined);
 
 interface Props {
-	initialConversations: Preloaded<typeof api.conversations.getOwnedByProject>;
+	initialConversations: Preloaded<
+		typeof api.user.conversations.getOwnedByProject
+	>;
 	children: React.ReactNode;
 }
 

@@ -1,10 +1,10 @@
 import { v } from "convex/values";
 import createHttpError from "http-errors";
-import type { Doc, Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
-import { verifyProjectOwnership } from "./lib/auth";
-import { withAuth } from "./lib/hoc";
-import { updateProjectTimestamp } from "./lib/utils";
+import type { Doc, Id } from "../_generated/dataModel";
+import { mutation, query } from "../_generated/server";
+import { verifyProjectOwnership } from "../lib/auth";
+import { withAuth } from "../lib/hoc";
+import { updateProjectTimestamp } from "../lib/utils";
 
 export const getOwnedAll = query({
 	args: {

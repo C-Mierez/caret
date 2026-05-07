@@ -4,7 +4,7 @@ import { useMutation } from "convex/react";
 import { optimisticUpdateFileCache } from "./optimistic-update-cache";
 
 export default function useFilesCreateFile() {
-	return useMutation(api.files.createFile).withOptimisticUpdate(
+	return useMutation(api.user.files.createFile).withOptimisticUpdate(
 		(localStore, args) => {
 			const { projectId, content, name, parentId } = args;
 			const now = Date.now();

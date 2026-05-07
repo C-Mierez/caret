@@ -17,7 +17,7 @@ export function withProjectsGetOwnedAll<Props extends object = object>(
 	>({
 		errorMessage: "Error fetching projects:",
 		getData: (_props, token) =>
-			preloadQuery(api.projects.getOwnedAll, {}, { token }),
+			preloadQuery(api.user.projects.getOwnedAll, {}, { token }),
 		render: ({ props, data: initialProjects, Component }) => {
 			if (!initialProjects) redirect(URLs.root);
 

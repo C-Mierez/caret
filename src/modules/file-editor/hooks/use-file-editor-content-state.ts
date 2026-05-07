@@ -32,7 +32,7 @@ export default function useFileEditorContentState() {
 	const updateFileContent = useFilesUpdateContent();
 
 	const activeFile = useQuery(
-		api.files.getOwnedById,
+		api.user.files.getOwnedById,
 		projectId && activeFileId ? { fileId: activeFileId } : "skip",
 	);
 

@@ -22,7 +22,7 @@ export function withConversationsGetOwnedByProject<P extends Props>(
 			const { projectId } = await props.params;
 
 			return preloadQuery(
-				api.conversations.getOwnedByProject,
+				api.user.conversations.getOwnedByProject,
 				{ projectId: projectId as Id<"projects"> },
 				{ token },
 			);

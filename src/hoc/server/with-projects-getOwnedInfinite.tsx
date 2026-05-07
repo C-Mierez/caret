@@ -21,7 +21,7 @@ export function withProjectsGetOwnedInfinite<Props extends object = object>(
 		getData: (_props, token) =>
 			Promise.all([
 				fetchQuery(
-					api.projects.getOwnedInfinite,
+					api.user.projects.getOwnedInfinite,
 					{
 						paginationOpts: {
 							numItems: DEFAULT_PROJECTS_LIMIT,
@@ -30,7 +30,7 @@ export function withProjectsGetOwnedInfinite<Props extends object = object>(
 					},
 					{ token },
 				),
-				fetchQuery(api.projects.getOwnedCount, {}, { token }),
+				fetchQuery(api.user.projects.getOwnedCount, {}, { token }),
 			]),
 		render: ({
 			props,
