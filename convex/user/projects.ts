@@ -51,7 +51,7 @@ export const getOwnedInfinite = query({
 		async (ctx, args: { paginationOpts: PaginationOptions }) => {
 			return await ctx.db
 				.query("projects")
-				.withIndex("by_owner", (q) =>
+				.withIndex("by_owner_updated", (q) =>
 					q.eq("ownerId", ctx.identity.subject),
 				)
 				.order("desc")
