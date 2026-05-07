@@ -13,7 +13,7 @@ import useModal from "@hooks/use-modal";
 import useUpdateProjectSettings from "@modules/projects/hooks/use-update-project-settings";
 import { useForm } from "@tanstack/react-form";
 import { SettingsIcon } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 
 interface Props {
@@ -37,6 +37,7 @@ export default function PreviewSettingsPopover({
 }: Props) {
 	const updateSettings = useUpdateProjectSettings();
 	const previewSettingsModal = useModal();
+	const [submitError, setSubmitError] = useState<string | null>(null);
 	const defaultValues = useMemo(
 		() => ({
 			installCommand: initialValues?.installCommand ?? "",
@@ -51,15 +52,26 @@ export default function PreviewSettingsPopover({
 			onSubmit: formSchema,
 		},
 		onSubmit: async ({ value }) => {
-			await updateSettings({
-				projectId,
-				settings: {
-					installCommand: value.installCommand.trim() || undefined,
-					devCommand: value.devCommand.trim() || undefined,
-				},
-			});
-			previewSettingsModal.closeModal();
-			onSave?.();
+			setSubmitError(null);
+			try {
+				await updateSettings({
+					projectId,
+					settings: {
+						installCommand:
+							value.installCommand.trim() || undefined,
+						devCommand: value.devCommand.trim() || undefined,
+					},
+				});
+				previewSettingsModal.closeModal();
+				onSave?.();
+			} catch (err) {
+				const message =
+					err instanceof Error ? err.message : String(err);
+				console.error("Failed to update preview settings", err);
+				setSubmitError(message || "Failed to save settings");
+				// return early so the popover stays open and isSubmitting is cleared
+				return;
+			}
 		},
 	});
 
@@ -147,6 +159,11 @@ export default function PreviewSettingsPopover({
 							</Field>
 						)}
 					</form.Field>
+					{submitError ? (
+						<div className="text-red-600 text-sm">
+							{submitError}
+						</div>
+					) : null}
 					<form.Subscribe
 						selector={(state) => [
 							state.canSubmit,

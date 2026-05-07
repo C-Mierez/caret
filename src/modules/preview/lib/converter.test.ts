@@ -1,3 +1,5 @@
+/// <reference types="bun-types" />
+
 import { describe, expect, test } from "bun:test";
 
 import {
@@ -11,11 +13,15 @@ function makeFile(
 ): ProjectFile {
 	return {
 		_id: overrides._id,
+		_creationTime: overrides._creationTime ?? 0,
 		name: overrides.name ?? "file.txt",
 		parentId: overrides.parentId,
+		projectId:
+			overrides.projectId ?? ("project" as ProjectFile["projectId"]),
 		type: overrides.type ?? "file",
 		content: overrides.content,
 		storageId: overrides.storageId,
+		updatedAt: overrides.updatedAt ?? 0,
 	};
 }
 

@@ -104,13 +104,15 @@ export default function PreviewView() {
 								<div className="mx-auto flex max-w-md flex-col items-center gap-2 text-center">
 									<Loader2Icon className="size-6 animate-spin" />
 									<p className="font-medium text-sm">
-										Installing...
+										{status === "booting"
+											? "Starting..."
+											: "Installing..."}
 									</p>
 								</div>
 							</div>
 						)}
 
-						{previewUrl && (
+						{previewUrl && !error && (
 							<iframe
 								src={previewUrl}
 								className="size-full border-0"

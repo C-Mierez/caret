@@ -14,7 +14,7 @@
 		"lint:check": "biome check",
 		"lint:fix": "biome lint --write",
 		"format": "biome format --write",
-		"test:webcontainer": "bun test src/modules/webcontainer/lib/converter.test.ts",
+		"test:converter": "bun test src/modules/preview/lib/converter.test.ts",
 		"env:sync": "bunx --bun env-sync sync",
 		"env:check": "bunx --bun env-sync check",
 		"postinstall": "node scripts/patch-agent-kit-gemini.js && lefthook install"

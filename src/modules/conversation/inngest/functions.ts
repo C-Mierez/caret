@@ -257,24 +257,10 @@ export const messagesSent = inngest.createFunction(
 			},
 		);
 
-		// Generate title in parallel (without step.run to avoid nesting)
+		// Start title generation early (without awaiting) so it doesn't block
+		// the main assistant/network run. We'll await it later once the
+		// assistant path has completed.
 		const newTitlePromise = generateTitleAsync();
-
-		const newTitle = await newTitlePromise;
-
-		await step.run("update-conversation-title", async () => {
-			if (!newTitle) {
-				return;
-			}
-
-			const convexClient = await getMachineConvexClient(serviceToken);
-
-			await convexClient.mutation(api.system.updateConversationTitle, {
-				conversationId: event.data
-					.conversationId as Id<"conversations">,
-				title: newTitle,
-			});
-		});
 
 		const codingAgent = createCodingAgentAssistant(
 			_systemPrompt,
@@ -311,6 +297,30 @@ export const messagesSent = inngest.createFunction(
 				status: "sent",
 			});
 		});
+
+		// Await title generation now that the main assistant processing is
+		// complete. Update the conversation title if we received one.
+		try {
+			const newTitle = await newTitlePromise;
+
+			await step.run("update-conversation-title", async () => {
+				if (!newTitle) return;
+
+				const convexClient = await getMachineConvexClient(serviceToken);
+
+				await convexClient.mutation(
+					api.system.updateConversationTitle,
+					{
+						conversationId: event.data
+							.conversationId as Id<"conversations">,
+						title: newTitle,
+					},
+				);
+			});
+		} catch (err) {
+			// If title generation failed or timed out, just skip the update.
+			console.warn("Title generation skipped after assistant run", err);
+		}
 
 		return { success: true, conversation };
 	},
