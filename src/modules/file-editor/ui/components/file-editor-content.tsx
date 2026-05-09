@@ -5,10 +5,10 @@ import useFileEditorContentState from "@modules/file-editor/hooks/use-file-edito
 
 export default function FileEditorContent() {
 	const {
-		project,
-		openFiles,
+		project: _project,
+		openFiles: _openFiles,
 		activeFileId,
-		previewFileId,
+		previewFileId: _previewFileId,
 		editorContainerRef,
 	} = useFileEditorContentState();
 

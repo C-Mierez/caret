@@ -9,6 +9,72 @@ function sortFilesByTypeAndName(a: Doc<"files">, b: Doc<"files">) {
 	return a.name.localeCompare(b.name);
 }
 
+export function optimisticUpdateProjectSettingsCache(
+	localStore: OptimisticLocalStore,
+	projectId: Id<"projects">,
+	settings: {
+		installCommand?: string;
+		devCommand?: string;
+	},
+	updatedAt: number,
+) {
+	const cachedProjectById = localStore.getQuery(api.projects.getOwnedById, {
+		projectId,
+	});
+
+	if (cachedProjectById !== undefined && cachedProjectById !== null) {
+		localStore.setQuery(
+			api.projects.getOwnedById,
+			{ projectId },
+			{
+				...cachedProjectById,
+				settings,
+				updated_at: updatedAt,
+			},
+		);
+	}
+
+	for (const cachedQuery of localStore.getAllQueries(
+		api.projects.getOwnedInfinite,
+	)) {
+		if (cachedQuery.value === undefined) {
+			continue;
+		}
+
+		const updatedProjects = cachedQuery.value.page.map((project) =>
+			project._id === projectId
+				? {
+						...project,
+						settings,
+						updated_at: updatedAt,
+					}
+				: project,
+		);
+
+		localStore.setQuery(api.projects.getOwnedInfinite, cachedQuery.args, {
+			...cachedQuery.value,
+			page: updatedProjects,
+		});
+	}
+
+	const cachedProjects = localStore.getQuery(api.projects.getOwnedAll, {});
+	if (cachedProjects !== undefined) {
+		localStore.setQuery(
+			api.projects.getOwnedAll,
+			{},
+			cachedProjects.map((project) =>
+				project._id === projectId
+					? {
+							...project,
+							settings,
+							updated_at: updatedAt,
+						}
+					: project,
+			),
+		);
+	}
+}
+
 /**
  * Shared optimistic-update helper for file/folder creation.
  * Handles sorting (folders first, then alphabetic) and cache updates for both queries.

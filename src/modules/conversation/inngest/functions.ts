@@ -168,33 +168,14 @@ export const messagesSent = inngest.createFunction(
 			},
 		);
 
-		const buildSystemPrompt = step.run("build-system-prompt", async () => {
-			let systemPrompt = CODING_AGENT_SYSTEM_PROMPT;
-
-			const contextMessages = recentMessages.filter(
-				(message) =>
-					message._id !== assistantMessageId &&
-					message.status === "sent" &&
-					message.content.trim() !== "",
-			);
-
-			if (contextMessages.length > 0) {
-				const contextPrompt = contextMessages
-					.map((message) => `${message.sender}: ${message.content}`)
-					.join("\n\n");
-				systemPrompt += `\n\n## Previous Conversation (for context only - do NOT repeat these responses):\n${contextPrompt}\n\n## Current Request:\nRespond ONLY to the user's new message below. Do not repeat or reference your previous responses.`;
-			}
-
-			return systemPrompt;
-		});
-
-		const buildConversationTitle = step.run("generate title", async () => {
+		// Helper function for title generation (not wrapped in step.run to avoid nesting)
+		const generateTitleAsync = async (): Promise<string | undefined> => {
 			if (conversation.title !== DEFAULT_CONVERSATION_TITLE) {
 				return;
 			}
 
 			const titleAgent = createAgentTitleGenerator();
-			// 15s timeout to avoid long-running step
+			// 200s timeout to avoid long-running step
 			const titleTimeout = new Promise<never>((_, reject) => {
 				setTimeout(() => {
 					reject(new Error("Title generation timed out"));
@@ -208,7 +189,7 @@ export const messagesSent = inngest.createFunction(
 				});
 
 				const { output } = await Promise.race([
-					titleAgent.run(event.data.message, { maxIter: 0 }),
+					titleAgent.run(event.data.message, { maxIter: 3 }),
 					titleTimeout,
 				]);
 
@@ -247,26 +228,39 @@ export const messagesSent = inngest.createFunction(
 				console.warn("Failed to generate conversation title", error);
 				return;
 			}
-		});
+		};
 
-		const [_systemPrompt, newTitle] = await Promise.all([
-			buildSystemPrompt,
-			buildConversationTitle,
-		]);
+		// Build system prompt (wrapped in step.run)
+		const _systemPrompt = await step.run(
+			"build-system-prompt",
+			async () => {
+				let systemPrompt = CODING_AGENT_SYSTEM_PROMPT;
 
-		await step.run("update-conversation-title", async () => {
-			if (!newTitle) {
-				return;
-			}
+				const contextMessages = recentMessages.filter(
+					(message) =>
+						message._id !== assistantMessageId &&
+						message.status === "sent" &&
+						message.content.trim() !== "",
+				);
 
-			const convexClient = await getMachineConvexClient(serviceToken);
+				if (contextMessages.length > 0) {
+					const contextPrompt = contextMessages
+						.map(
+							(message) =>
+								`${message.sender}: ${message.content}`,
+						)
+						.join("\n\n");
+					systemPrompt += `\n\n## Previous Conversation (for context only - do NOT repeat these responses):\n${contextPrompt}\n\n## Current Request:\nRespond ONLY to the user's new message below. Do not repeat or reference your previous responses.`;
+				}
 
-			await convexClient.mutation(api.system.updateConversationTitle, {
-				conversationId: event.data
-					.conversationId as Id<"conversations">,
-				title: newTitle,
-			});
-		});
+				return systemPrompt;
+			},
+		);
+
+		// Start title generation early (without awaiting) so it doesn't block
+		// the main assistant/network run. We'll await it later once the
+		// assistant path has completed.
+		const newTitlePromise = generateTitleAsync();
 
 		const codingAgent = createCodingAgentAssistant(
 			_systemPrompt,
@@ -303,6 +297,30 @@ export const messagesSent = inngest.createFunction(
 				status: "sent",
 			});
 		});
+
+		// Await title generation now that the main assistant processing is
+		// complete. Update the conversation title if we received one.
+		try {
+			const newTitle = await newTitlePromise;
+
+			await step.run("update-conversation-title", async () => {
+				if (!newTitle) return;
+
+				const convexClient = await getMachineConvexClient(serviceToken);
+
+				await convexClient.mutation(
+					api.system.updateConversationTitle,
+					{
+						conversationId: event.data
+							.conversationId as Id<"conversations">,
+						title: newTitle,
+					},
+				);
+			});
+		} catch (err) {
+			// If title generation failed or timed out, just skip the update.
+			console.warn("Title generation skipped after assistant run", err);
+		}
 
 		return { success: true, conversation };
 	},

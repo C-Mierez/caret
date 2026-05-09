@@ -482,7 +482,7 @@ export const deleteFile = mutation({
 			if (currentFile.storageId) {
 				try {
 					await ctx.storage.delete(currentFile.storageId);
-				} catch (e) {
+				} catch (_e) {
 					// ignore storage delete errors but don't stop DB cleanup
 				}
 			}

@@ -90,7 +90,7 @@ class SuggestionWidget extends WidgetType {
 		super();
 	}
 
-	toDOM(view: EditorView): HTMLElement {
+	toDOM(_view: EditorView): HTMLElement {
 		const span = document.createElement("span");
 
 		span.textContent = this.text;
