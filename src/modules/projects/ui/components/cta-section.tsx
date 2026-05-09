@@ -13,6 +13,7 @@ import {
 	uniqueNamesGenerator,
 } from "unique-names-generator";
 import { CTAButton } from "./cta-button";
+import ImportModal from "./import-modal";
 
 function generateRandomProjectName() {
 	return uniqueNamesGenerator({
@@ -26,6 +27,12 @@ export function CTASection() {
 	const [newProjectPlaceholder, setNewProjectPlaceholder] = useState("");
 
 	const createProject = useProjectCreate();
+	const newProjectModal = useModal({
+		onOpen: () => {
+			setNewProjectPlaceholder(generateRandomProjectName());
+		},
+	});
+	const importModal = useModal();
 
 	const onNewProjectConfirm = (input: string) => {
 		if (input === "") {
@@ -33,12 +40,6 @@ export function CTASection() {
 		}
 		createProject({ name: input });
 	};
-
-	const newProjectModal = useModal({
-		onOpen: () => {
-			setNewProjectPlaceholder(generateRandomProjectName());
-		},
-	});
 
 	return (
 		<>
@@ -63,7 +64,9 @@ export function CTASection() {
 						kbdKeyLabel: "I",
 						onTrigger: () => {},
 					}}
-					onClick={() => {}}
+					onClick={() => {
+						importModal.openModal();
+					}}
 				/>
 			</section>
 
@@ -75,6 +78,8 @@ export function CTASection() {
 				onConfirm={onNewProjectConfirm}
 				{...newProjectModal}
 			/>
+
+			<ImportModal {...importModal} />
 		</>
 	);
 }

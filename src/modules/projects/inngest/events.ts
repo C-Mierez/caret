@@ -20,6 +20,8 @@ const GithubExportSchema = z.object({
 	owner: z.string(),
 	repo: z.string(),
 	githubToken: z.string(),
+	description: z.string().optional(),
+	visibility: z.enum(["private", "public"]).optional(),
 });
 
 const GithubExportCancelledSchema = z.object({

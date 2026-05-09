@@ -58,6 +58,10 @@ export const updateExportStatus = mutation({
 			v.literal("canceled"),
 		),
 		exportRepoUrl: v.optional(v.string()),
+		exportDescription: v.optional(v.string()),
+		exportVisibility: v.optional(
+			v.union(v.literal("private"), v.literal("public")),
+		),
 	},
 	handler: async (ctx, args) => {
 		await verifyAuth(ctx);
@@ -67,6 +71,8 @@ export const updateExportStatus = mutation({
 		await ctx.db.patch(args.projectId, {
 			exportStatus: args.exportStatus,
 			exportRepoUrl: args.exportRepoUrl,
+			exportDescription: args.exportDescription,
+			exportVisibility: args.exportVisibility,
 			updated_at: now,
 		});
 

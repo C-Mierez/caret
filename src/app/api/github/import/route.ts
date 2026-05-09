@@ -7,7 +7,7 @@ import { GithubImportEvent } from "@modules/projects/inngest/events";
 import { NextResponse } from "next/server";
 import { inngest } from "@/inngest/client";
 
-export default async function POST(request: Request) {
+export async function POST(request: Request) {
 	const { userId } = await auth();
 
 	if (!userId) {
@@ -69,7 +69,7 @@ export default async function POST(request: Request) {
 	);
 
 	return NextResponse.json(
-		{ success: true, eventId: event.ids[0] },
+		{ success: true, eventId: event.ids[0], projectId },
 		{ status: 202 },
 	);
 }

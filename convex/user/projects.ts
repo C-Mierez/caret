@@ -116,3 +116,20 @@ export const updateSettings = mutation({
 		},
 	),
 });
+
+export const resetExportState = mutation({
+	args: {
+		projectId: v.id("projects"),
+	},
+	handler: withAuth(async (ctx, args: { projectId: Id<"projects"> }) => {
+		await verifyProjectOwnership(ctx, args.projectId);
+
+		await ctx.db.patch(args.projectId, {
+			exportStatus: "not_started",
+			exportRepoUrl: undefined,
+			exportDescription: undefined,
+			exportVisibility: undefined,
+			updated_at: Date.now(),
+		});
+	}),
+});

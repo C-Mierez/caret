@@ -13,6 +13,8 @@ export async function updateProjectStatus(options: {
 				type: "export";
 				status: Doc<"projects">["exportStatus"];
 				repoUrl?: string | null;
+				description?: string;
+				visibility?: "private" | "public";
 		  };
 }) {
 	const { mintServiceToken } = await import("@lib/server/service-token");
@@ -31,5 +33,7 @@ export async function updateProjectStatus(options: {
 		projectId: options.projectId as Id<"projects">,
 		exportStatus: options.payload.status,
 		exportRepoUrl: options.payload.repoUrl ?? undefined,
+		exportDescription: options.payload.description,
+		exportVisibility: options.payload.visibility,
 	});
 }

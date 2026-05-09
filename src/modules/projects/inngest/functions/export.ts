@@ -134,7 +134,13 @@ export const githubExport = inngest.createFunction(
 	async ({ event, step }) => {
 		console.log("Processing GitHub export event", event.data);
 
-		const { githubToken, owner, projectId, repo: repoName } = event.data;
+		const {
+			githubToken,
+			projectId,
+			repo: repoName,
+			description,
+			visibility,
+		} = event.data;
 
 		await updateProjectStatus({
 			projectId: projectId,
@@ -159,8 +165,8 @@ export const githubExport = inngest.createFunction(
 			async () => {
 				return await octokit.rest.repos.createForAuthenticatedUser({
 					name: repoName,
-					description: `Exported from Caret`,
-					private: true,
+					description: description || `Exported from Caret`,
+					private: visibility === "private",
 					auto_init: true,
 				});
 			},
@@ -176,20 +182,38 @@ export const githubExport = inngest.createFunction(
 					type: "export",
 					status: "exporting",
 					repoUrl: repo.html_url,
+					description,
+					visibility,
 				},
 			});
 		});
 
 		await step.run("poll-until-committed", async () => {
-			// Poll the repo until the default branch has a commit
+			// Bounded polling to avoid indefinite retries when GitHub repo initialization lags.
+			const maxAttempts = 10;
+			for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+				try {
+					await octokit.rest.repos.listCommits({
+						owner: user.login,
+						repo: repoName,
+						per_page: 1,
+					});
+					return;
+				} catch (error) {
+					if (attempt === maxAttempts) {
+						throw new Error(
+							`Repository initialization timed out after ${maxAttempts} attempts`,
+						);
+					}
 
-			await octokit.rest.repos.listCommits({
-				owner,
-				repo: repoName,
-				per_page: 1,
-			});
+					console.warn(
+						`Repo not ready yet (attempt ${attempt}/${maxAttempts}), retrying...`,
+						error,
+					);
 
-			// If the above call doesn't throw, it means the repo has at least one commit
+					await new Promise((resolve) => setTimeout(resolve, 2000));
+				}
+			}
 		});
 
 		// Get the initial commit
@@ -250,23 +274,33 @@ export const githubExport = inngest.createFunction(
 			return buildTreeNodes(files, blobShaMap);
 		})) as Array<{
 			path: string;
-			mode: string;
-			type: "blob" | "tree";
-			sha?: string;
+			mode: "100644";
+			type: "blob";
+			sha: string;
 		}>;
 
 		if (treeNodes.length === 0) {
 			throw new Error("No files to export. Tree is empty.");
 		}
 
-		// Create a new tree with all the blobs
+		const invalidTreeNodes = treeNodes.filter(
+			(node) => node.type !== "blob" || !node.sha,
+		);
+
+		if (invalidTreeNodes.length > 0) {
+			throw new Error(
+				`Invalid tree payload: found ${invalidTreeNodes.length} nodes without required blob SHA`,
+			);
+		}
+
+		// Create a new tree with all blob entries.
 		const { data: newTree } = (await step.run("create-tree", async () => {
 			return await octokit.rest.git.createTree({
 				owner: user.login,
 				repo: repoName,
 				tree: treeNodes.map((node) => ({
 					path: node.path,
-					mode: node.mode as "100644" | "100755" | "040000",
+					mode: node.mode,
 					type: node.type,
 					sha: node.sha,
 				})),

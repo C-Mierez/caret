@@ -6,9 +6,9 @@ type FileWithUrl = Doc<"files"> & {
 
 type TreeNode = {
 	path: string;
-	mode: string; // "100644" for files, "100755" for executable, "040000" for directories
-	type: "blob" | "tree";
-	sha?: string;
+	mode: "100644";
+	type: "blob";
+	sha: string;
 };
 
 /**
@@ -24,7 +24,6 @@ export function buildTreeNodes(
 	blobShaMap: Map<string, string>,
 ): TreeNode[] {
 	const treeNodes: TreeNode[] = [];
-	const processedPaths = new Set<string>();
 
 	// Build a map of path to file for quick lookups
 	const idToName = new Map<string, string>();
@@ -51,36 +50,24 @@ export function buildTreeNodes(
 		return path.join("/");
 	};
 
-	// Process all files and folders
+	// Process only file entries. Folder entries are derived from blob paths by GitHub.
 	for (const file of files) {
+		if (file.type !== "file") {
+			continue;
+		}
+
 		const filePath = getPath(file._id);
 
-		if (file.type === "folder") {
-			// Add folder node if not already added
-			if (!processedPaths.has(filePath)) {
-				treeNodes.push({
-					path: filePath,
-					mode: "040000",
-					type: "tree",
-				});
-				processedPaths.add(filePath);
-			}
-		} else if (file.type === "file") {
-			// Add file node with blob SHA
-			const blobSha = blobShaMap.get(filePath);
-			if (blobSha) {
-				treeNodes.push({
-					path: filePath,
-					mode: "100644",
-					type: "blob",
-					sha: blobSha,
-				});
-				processedPaths.add(filePath);
-			} else {
-				console.warn(
-					`Blob SHA not found for file ${filePath}. Skipping.`,
-				);
-			}
+		const blobSha = blobShaMap.get(filePath);
+		if (blobSha) {
+			treeNodes.push({
+				path: filePath,
+				mode: "100644",
+				type: "blob",
+				sha: blobSha,
+			});
+		} else {
+			console.warn(`Blob SHA not found for file ${filePath}. Skipping.`);
 		}
 	}
 
