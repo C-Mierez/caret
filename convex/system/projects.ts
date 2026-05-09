@@ -1,9 +1,26 @@
 import { v } from "convex/values";
-import { mutation } from "../_generated/server";
+import { mutation, query } from "../_generated/server";
 import { verifyAuth } from "../lib/auth";
 import { updateProjectTimestamp } from "../lib/utils";
 
 /* -------------------------------- Mutations ------------------------------- */
+
+// A system call meant to be used when creating from a github repo
+export const create = mutation({
+	args: {
+		name: v.string(),
+		ownerId: v.string(),
+	},
+	handler: async (ctx, args) => {
+		return await ctx.db.insert("projects", {
+			name: args.name,
+			ownerId: args.ownerId,
+			updated_at: Date.now(),
+			importStatus: "importing",
+			exportStatus: "not_started",
+		});
+	},
+});
 
 export const updateImportStatus = mutation({
 	args: {
@@ -54,5 +71,33 @@ export const updateExportStatus = mutation({
 		});
 
 		await updateProjectTimestamp(ctx, args.projectId, now);
+	},
+});
+
+export const getProject = query({
+	args: {
+		projectId: v.id("projects"),
+	},
+	handler: async (ctx, args) => {
+		await verifyAuth(ctx);
+
+		const project = await ctx.db.get(args.projectId);
+
+		if (!project) {
+			return null;
+		}
+
+		return project;
+	},
+});
+
+export const deleteProject = mutation({
+	args: {
+		projectId: v.id("projects"),
+	},
+	handler: async (ctx, args) => {
+		await verifyAuth(ctx);
+
+		await ctx.db.delete(args.projectId);
 	},
 });

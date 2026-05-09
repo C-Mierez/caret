@@ -71,6 +71,30 @@ export const getFileById = query({
 	},
 });
 
+export const getFilesWithUrls = query({
+	args: {
+		projectId: v.id("projects"),
+	},
+	handler: async (ctx, args) => {
+		await verifyAuth(ctx);
+
+		const files = await ctx.db
+			.query("files")
+			.withIndex("by_project", (q) => q.eq("projectId", args.projectId))
+			.collect();
+
+		return await Promise.all(
+			files.map(async (file) => {
+				if (file.storageId) {
+					const storageUrl = await ctx.storage.getUrl(file.storageId);
+					return { ...file, storageUrl };
+				}
+				return { ...file, storageUrl: null };
+			}),
+		);
+	},
+});
+
 /* -------------------------------- Mutations ------------------------------- */
 
 export const updateFileContent = mutation({
