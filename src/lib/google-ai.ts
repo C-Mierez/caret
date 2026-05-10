@@ -16,7 +16,7 @@ export const geminiModel = gemini({
 	defaultParameters: {
 		generationConfig: {
 			thinkingConfig: {
-				thinkingLevel: "LOW",
+				thinkingBudget: 1024,
 			},
 		},
 	},

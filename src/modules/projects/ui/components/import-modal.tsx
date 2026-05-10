@@ -42,9 +42,6 @@ export default function ImportModal({ ...modalProps }: Props) {
 		error: hookError,
 	} = useProjectImport();
 
-	const [importedProjectId, setImportedProjectId] = useState<string | null>(
-		null,
-	);
 	const [isRedirecting, setIsRedirecting] = useState(false);
 
 	const defaultValues = useMemo<ImportFormData>(
@@ -66,7 +63,6 @@ export default function ImportModal({ ...modalProps }: Props) {
 				});
 
 				// Project created successfully
-				setImportedProjectId(response.projectId || "");
 				toast.success("Project created! Redirecting...");
 
 				// Redirect to the project page
@@ -75,7 +71,7 @@ export default function ImportModal({ ...modalProps }: Props) {
 					router.push(buildProjectUrl(response.projectId || ""));
 					closeModalSafe();
 				}, 500);
-			} catch (err) {
+			} catch {
 				toast.error(hookError || "Failed to import project");
 			}
 		},
@@ -85,7 +81,6 @@ export default function ImportModal({ ...modalProps }: Props) {
 	useEffect(() => {
 		if (modalProps.isOpen) {
 			form.reset(defaultValues);
-			setImportedProjectId(null);
 			setIsRedirecting(false);
 		}
 	}, [modalProps.isOpen, defaultValues, form]);
@@ -96,7 +91,6 @@ export default function ImportModal({ ...modalProps }: Props) {
 
 	const handleRetry = useCallback(() => {
 		form.reset(defaultValues);
-		setImportedProjectId(null);
 		setIsRedirecting(false);
 	}, [form, defaultValues]);
 
@@ -188,7 +182,10 @@ export default function ImportModal({ ...modalProps }: Props) {
 										/>
 										{isInvalid && (
 											<FieldError>
-												{field.state.meta.errors[0]}
+												{typeof field.state.meta
+													.errors[0] === "string"
+													? field.state.meta.errors[0]
+													: "Invalid input"}
 											</FieldError>
 										)}
 										<FieldDescription>

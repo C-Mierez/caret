@@ -87,16 +87,28 @@ export default function ProjectsIdView({ projectId }: Props) {
 						</li>
 					</ul>
 				</nav>
-				{activeTab === "Code" && (
-					<div className="min-h-0 flex-1">
+				<div className="relative min-h-0 flex-1">
+					<div
+						className={cn(
+							"absolute inset-0 min-h-0",
+							activeTab === "Code"
+								? "pointer-events-auto opacity-100"
+								: "pointer-events-none opacity-0",
+						)}
+					>
 						<FileEditorView />
 					</div>
-				)}
-				{activeTab === "Preview" && (
-					<div className="min-h-0 flex-1">
+					<div
+						className={cn(
+							"absolute inset-0 min-h-0",
+							activeTab === "Preview"
+								? "pointer-events-auto opacity-100"
+								: "pointer-events-none opacity-0",
+						)}
+					>
 						<PreviewView />
 					</div>
-				)}
+				</div>
 			</div>
 
 			<ExportModal projectId={projectId} {...exportModal} />

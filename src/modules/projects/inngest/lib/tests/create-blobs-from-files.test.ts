@@ -168,7 +168,7 @@ describe("createBlobsFromFiles", () => {
 			.fn()
 			.mockResolvedValue(
 				new Response(binaryBuffer, { status: 200 }),
-			) as any;
+			) as unknown as typeof fetch;
 
 		const files: FileWithUrl[] = [
 			createMockFile({
@@ -263,8 +263,20 @@ describe("createBlobsFromFiles", () => {
 		});
 
 		// Verify that createBlob was called with base64 encoded content
-		const callArgs = (mockOctokit.rest.git.createBlob as any).mock
-			.calls[0][0];
+		const createBlobMock = mockOctokit.rest.git.createBlob as unknown as {
+			mock: {
+				calls: Array<
+					[
+						{
+							content: string;
+							encoding: string;
+						},
+					]
+				>;
+			};
+		};
+
+		const callArgs = createBlobMock.mock.calls[0][0];
 
 		expect(callArgs.content).toBe(
 			Buffer.from("Hello, World!", "utf-8").toString("base64"),
