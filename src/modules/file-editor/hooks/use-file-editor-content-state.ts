@@ -199,6 +199,7 @@ export default function useFileEditorContentState() {
 		project,
 		openFiles,
 		activeFileId,
+		activeFile,
 		previewFileId,
 		editorContainerRef,
 		editorViewRef,

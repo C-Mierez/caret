@@ -34,12 +34,8 @@ function buildTreeNode(
 	files: ProjectFileMap,
 ): FileSystemTree[string] {
 	if (file.type === "file") {
-		if (file.storageId) {
-			throw new Error(
-				`Binary file "${getFilePath(file, files)}" cannot be converted without fetching its contents first.`,
-			);
-		}
-
+		// Treat files that point to external storage (binary) as empty files
+		// so we can build the file tree without fetching their contents.
 		return {
 			file: {
 				contents: file.content ?? "",

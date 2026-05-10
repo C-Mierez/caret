@@ -2,15 +2,21 @@
 
 import CaretSvg from "@components/svg/caret-svg";
 import useFileEditorContentState from "@modules/file-editor/hooks/use-file-editor-content-state";
+import UnsupportedFileScreen from "./unsupported-file-screen";
 
 export default function FileEditorContent() {
 	const {
 		project: _project,
 		openFiles: _openFiles,
 		activeFileId,
+		activeFile,
 		previewFileId: _previewFileId,
 		editorContainerRef,
 	} = useFileEditorContentState();
+
+	if (activeFile?.storageId) {
+		return <UnsupportedFileScreen />;
+	}
 
 	if (!activeFileId) {
 		// Empty file screen
