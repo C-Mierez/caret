@@ -119,7 +119,7 @@ function FileTreeNode({ path, type, depth }: FileTreeNodeProps) {
 		currentParentId === undefined || expandedIds.includes(currentParentId);
 
 	const data = useQuery(
-		api.files.getOwnedSorted,
+		api.user.files.getOwnedSorted,
 		shouldQueryChildren
 			? {
 					projectId,

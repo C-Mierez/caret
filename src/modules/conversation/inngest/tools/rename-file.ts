@@ -26,7 +26,7 @@ export const renameFile = createTool({
 
 				const convexClient = await getMachineConvexClient(serviceToken);
 
-				await convexClient.mutation(api.system.renameFile, {
+				await convexClient.mutation(api.system.files.renameFile, {
 					fileId: input.fileId as Id<"files">,
 					newName: input.newName,
 				});

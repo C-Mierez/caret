@@ -31,9 +31,12 @@ export const deleteFiles = createTool({
 
 				for (const fileId of input.fileIds) {
 					try {
-						await convexClient.mutation(api.system.deleteFile, {
-							fileId: fileId as Id<"files">,
-						});
+						await convexClient.mutation(
+							api.system.files.deleteFile,
+							{
+								fileId: fileId as Id<"files">,
+							},
+						);
 
 						results.push({
 							id: fileId,

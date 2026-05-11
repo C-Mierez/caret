@@ -3,7 +3,7 @@ import { useMutation } from "convex/react";
 import { optimisticRemoveFileCache } from "./optimistic-update-cache";
 
 export default function useFilesRemove() {
-	return useMutation(api.files.remove).withOptimisticUpdate(
+	return useMutation(api.user.files.remove).withOptimisticUpdate(
 		(localStore, args) => {
 			optimisticRemoveFileCache(localStore, args.fileId);
 		},

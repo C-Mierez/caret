@@ -65,13 +65,16 @@ export const createFiles = createTool({
 				// Create files in batches by parent folder
 				for (const [parentId, groupedFiles] of filesByParent) {
 					try {
-						await convexClient.mutation(api.system.createFiles, {
-							projectId: input.projectId as Id<"projects">,
-							parentId: parentId
-								? (parentId as Id<"files">)
-								: undefined,
-							files: groupedFiles,
-						});
+						await convexClient.mutation(
+							api.system.files.createFiles,
+							{
+								projectId: input.projectId as Id<"projects">,
+								parentId: parentId
+									? (parentId as Id<"files">)
+									: undefined,
+								files: groupedFiles,
+							},
+						);
 
 						for (const file of groupedFiles) {
 							results.push({

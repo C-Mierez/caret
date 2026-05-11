@@ -2,10 +2,10 @@ import { api } from "@convex/_generated/api";
 import { useMutation } from "convex/react";
 
 export default function useProjectRename() {
-	return useMutation(api.projects.rename).withOptimisticUpdate(
+	return useMutation(api.user.projects.rename).withOptimisticUpdate(
 		(localStore, args) => {
 			const existingProject = localStore.getQuery(
-				api.projects.getOwnedById,
+				api.user.projects.getOwnedById,
 				{
 					projectId: args.projectId,
 				},
@@ -13,7 +13,7 @@ export default function useProjectRename() {
 
 			if (existingProject !== undefined && existingProject !== null) {
 				localStore.setQuery(
-					api.projects.getOwnedById,
+					api.user.projects.getOwnedById,
 					{ projectId: args.projectId },
 					{
 						...existingProject,
@@ -25,7 +25,7 @@ export default function useProjectRename() {
 
 			// Optimistic update for projects.getOwnedInfinite
 			for (const cachedQuery of localStore.getAllQueries(
-				api.projects.getOwnedInfinite,
+				api.user.projects.getOwnedInfinite,
 			)) {
 				if (cachedQuery.value === undefined) {
 					continue;
@@ -47,7 +47,7 @@ export default function useProjectRename() {
 				});
 
 				localStore.setQuery(
-					api.projects.getOwnedInfinite,
+					api.user.projects.getOwnedInfinite,
 					cachedQuery.args,
 					{
 						...cachedQuery.value,
@@ -58,7 +58,7 @@ export default function useProjectRename() {
 
 			// Optimistic update for projects.getOwnedAll
 			const cachedQuery = localStore.getQuery(
-				api.projects.getOwnedAll,
+				api.user.projects.getOwnedAll,
 				{},
 			);
 			if (cachedQuery !== undefined) {
@@ -74,7 +74,7 @@ export default function useProjectRename() {
 				});
 
 				localStore.setQuery(
-					api.projects.getOwnedAll,
+					api.user.projects.getOwnedAll,
 					{},
 					updatedProjects,
 				);

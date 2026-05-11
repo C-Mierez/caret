@@ -15,7 +15,7 @@ export default function useFileEditorBreadcrumbState() {
 	const previewFileId = projectFileState?.previewFileId ?? null;
 
 	const activePath = useQuery(
-		api.files.getOwnedPathToRoot,
+		api.user.files.getOwnedPathToRoot,
 		projectId && activeFileId
 			? {
 					fileId: activeFileId,
@@ -24,7 +24,7 @@ export default function useFileEditorBreadcrumbState() {
 	);
 
 	const activeFile = useQuery(
-		api.files.getOwnedById,
+		api.user.files.getOwnedById,
 		projectId && activeFileId
 			? {
 					fileId: activeFileId,

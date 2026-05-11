@@ -23,7 +23,7 @@ export default function FileEditorNavigation() {
 	} = useFileEditorNavigationState();
 
 	const allFiles = useQuery(
-		api.files.getOwnedAll,
+		api.user.files.getOwnedAll,
 		projectId
 			? {
 					projectId,

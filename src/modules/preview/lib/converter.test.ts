@@ -153,16 +153,22 @@ describe("buildFileTreeFromProject", () => {
 		});
 	});
 
-	test("throws for binary files that still point at storage", () => {
+	test("treats binary files that point at storage as empty files", () => {
 		const binaryFile = makeFile({
 			_id: "file-binary" as ProjectFile["_id"],
 			name: "image.png",
 			storageId: "storage-id" as ProjectFile["storageId"],
 		});
 
-		expect(() => buildFileTreeFromProject([binaryFile])).toThrow(
-			'Binary file "/image.png" cannot be converted without fetching its contents first.',
-		);
+		const tree = buildFileTreeFromProject([binaryFile]);
+
+		expect(tree).toEqual({
+			"image.png": {
+				file: {
+					contents: "",
+				},
+			},
+		});
 	});
 });
 

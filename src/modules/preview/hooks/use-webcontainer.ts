@@ -19,6 +19,12 @@ let bootPromise: Promise<WebContainer> | null =
 	G.__webcontainerBootPromise ?? null;
 
 async function getWebContainer(): Promise<WebContainer> {
+	if (typeof self !== "undefined" && !self.crossOriginIsolated) {
+		throw new Error(
+			"Preview requires cross-origin isolation (SharedArrayBuffer). Ensure COOP/COEP headers are configured before booting WebContainer.",
+		);
+	}
+
 	if (webContainerInstance) {
 		return webContainerInstance;
 	}
@@ -44,13 +50,14 @@ async function getWebContainer(): Promise<WebContainer> {
 			if (
 				msg.includes(
 					"Only a single WebContainer instance can be booted",
-				)
+				) ||
+				msg.includes("Unable to create more instances")
 			) {
 				// Clean up global boot promise so future attempts can retry
 				bootPromise = null;
 				delete G.__webcontainerBootPromise;
 				throw new Error(
-					"WebContainer is already booted in this page. Refresh the page or reuse the existing preview tab.",
+					"WebContainer instance limit reached. Reuse the existing preview, click Restart, or refresh the page.",
 				);
 			}
 
@@ -132,7 +139,7 @@ export function useWebContainer({ projectId, enabled, settings }: Props) {
 
 	// Fetch the files
 	// Since this is convex, files will auto-update on changes
-	const files = useQuery(api.files.getOwnedAll, { projectId });
+	const files = useQuery(api.user.files.getOwnedAll, { projectId });
 
 	// Mount
 	// biome-ignore lint/correctness/useExhaustiveDependencies: ...
@@ -237,11 +244,6 @@ export function useWebContainer({ projectId, enabled, settings }: Props) {
 		}
 
 		start();
-
-		return () => {
-			hasStartedRef.current = false;
-			cleanupWebContainer();
-		};
 	}, [
 		enabled,
 		files,
@@ -249,6 +251,14 @@ export function useWebContainer({ projectId, enabled, settings }: Props) {
 		settings?.devCommand,
 		_restartKey,
 	]);
+
+	// Teardown only on unmount to avoid repeated re-boots on reactive updates.
+	useEffect(() => {
+		return () => {
+			hasStartedRef.current = false;
+			cleanupWebContainer();
+		};
+	}, []);
 
 	// Sync file changes (Hot-Reload)
 	useEffect(() => {

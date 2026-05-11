@@ -3,7 +3,7 @@ import type { Doc, Id } from "@convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 
 export default function useProjectCreate() {
-	return useMutation(api.projects.create).withOptimisticUpdate(
+	return useMutation(api.user.projects.create).withOptimisticUpdate(
 		(localStore, args) => {
 			const now = Date.now();
 			const newProject = {
@@ -18,7 +18,7 @@ export default function useProjectCreate() {
 
 			// Optimistic update for projects.getOwnedInfinite
 			for (const cachedQuery of localStore.getAllQueries(
-				api.projects.getOwnedInfinite,
+				api.user.projects.getOwnedInfinite,
 			)) {
 				if (cachedQuery.value === undefined) {
 					continue;
@@ -29,7 +29,7 @@ export default function useProjectCreate() {
 				}
 
 				localStore.setQuery(
-					api.projects.getOwnedInfinite,
+					api.user.projects.getOwnedInfinite,
 					cachedQuery.args,
 					{
 						...cachedQuery.value,
@@ -40,11 +40,11 @@ export default function useProjectCreate() {
 
 			// Optimistic update for projects.getOwnedAll
 			const cachedQuery = localStore.getQuery(
-				api.projects.getOwnedAll,
+				api.user.projects.getOwnedAll,
 				{},
 			);
 			if (cachedQuery !== undefined) {
-				localStore.setQuery(api.projects.getOwnedAll, {}, [
+				localStore.setQuery(api.user.projects.getOwnedAll, {}, [
 					newProject,
 					...cachedQuery,
 				]);

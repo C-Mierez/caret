@@ -60,7 +60,7 @@ export default function useConversationPanelState({ projectId }: Props) {
 
 	const conversationMessages =
 		useQuery(
-			api.conversations.getMessagesByConversation,
+			api.user.conversations.getMessagesByConversation,
 			activeConversationId
 				? {
 						conversationId: activeConversationId,

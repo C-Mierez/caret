@@ -1,10 +1,10 @@
 import type { PaginationOptions } from "convex/server";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
-import { verifyProjectOwnership } from "./lib/auth";
-import { withAuth } from "./lib/hoc";
+import type { Id } from "../_generated/dataModel";
+import { mutation, query } from "../_generated/server";
+import { verifyProjectOwnership } from "../lib/auth";
+import { withAuth } from "../lib/hoc";
 
 export const create = mutation({
 	args: {
@@ -51,7 +51,7 @@ export const getOwnedInfinite = query({
 		async (ctx, args: { paginationOpts: PaginationOptions }) => {
 			return await ctx.db
 				.query("projects")
-				.withIndex("by_owner", (q) =>
+				.withIndex("by_owner_updated", (q) =>
 					q.eq("ownerId", ctx.identity.subject),
 				)
 				.order("desc")
@@ -115,4 +115,21 @@ export const updateSettings = mutation({
 			});
 		},
 	),
+});
+
+export const resetExportState = mutation({
+	args: {
+		projectId: v.id("projects"),
+	},
+	handler: withAuth(async (ctx, args: { projectId: Id<"projects"> }) => {
+		await verifyProjectOwnership(ctx, args.projectId);
+
+		await ctx.db.patch(args.projectId, {
+			exportStatus: "not_started",
+			exportRepoUrl: undefined,
+			exportDescription: undefined,
+			exportVisibility: undefined,
+			updated_at: Date.now(),
+		});
+	}),
 });

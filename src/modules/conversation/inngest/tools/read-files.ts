@@ -40,7 +40,7 @@ export const readFiles = createTool({
 
 					try {
 						file = await convexClient.query(
-							api.system.getFileById,
+							api.system.files.getFileById,
 							{ fileId: fileId as Id<"files"> },
 						);
 					} catch {

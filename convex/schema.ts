@@ -23,6 +23,10 @@ export default defineSchema({
 		),
 
 		exportRepoUrl: v.optional(v.string()), // URL of the Git repository, if it exists
+		exportDescription: v.optional(v.string()), // Description used when exporting
+		exportVisibility: v.optional(
+			v.union(v.literal("private"), v.literal("public")),
+		), // Visibility of exported repository
 
 		settings: v.optional(
 			v.object({
@@ -30,7 +34,9 @@ export default defineSchema({
 				devCommand: v.optional(v.string()),
 			}),
 		),
-	}).index("by_owner", ["ownerId"]),
+	})
+		.index("by_owner", ["ownerId"])
+		.index("by_owner_updated", ["ownerId", "updated_at"]),
 
 	files: defineTable({
 		projectId: v.id("projects"),
