@@ -17,6 +17,7 @@ import useModalHandler from "@hooks/use-modal-handler";
 import useProjectExport from "@modules/projects/hooks/use-project-export";
 import useProjectResetExportState from "@modules/projects/hooks/use-project-reset-export-state";
 import { useForm } from "@tanstack/react-form";
+import { HTTPError, default as ky } from "ky";
 import { Loader2Icon } from "lucide-react";
 import { useCallback, useEffect, useMemo } from "react";
 import { toast } from "sonner";
@@ -104,16 +105,30 @@ export default function ExportModal({ projectId, ...modalProps }: Props) {
 	const isCanceled = project?.exportStatus === "canceled";
 	const handleCancel = useCallback(async () => {
 		try {
-			// Call cancel endpoint
-			await fetch("/api/github/export/cancel", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ projectId }),
+			await ky.post("/api/github/export/cancel", {
+				json: { projectId },
 			});
 			toast.success("Export cancelled");
 			closeModalSafe();
-		} catch {
-			toast.error("Failed to cancel export");
+		} catch (error) {
+			let message = "Failed to cancel export";
+
+			if (error instanceof HTTPError) {
+				try {
+					const payload = (await error.response.json()) as {
+						error?: string;
+					};
+					message =
+						payload.error || error.response.statusText || message;
+				} catch {
+					message =
+						error.response.statusText || error.message || message;
+				}
+			} else if (error instanceof Error) {
+				message = error.message;
+			}
+
+			toast.error(message);
 		}
 	}, [projectId, closeModalSafe]);
 

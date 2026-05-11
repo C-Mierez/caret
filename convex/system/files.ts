@@ -375,16 +375,18 @@ export const removeAllFilesFromProject = mutation({
 
 		await Promise.all(
 			files.map((file) => {
-				if (file.storageId) {
-					ctx.storage.delete(file.storageId).catch(() => {
-						// ignore storage delete errors but don't stop DB cleanup
-					});
-				}
-
-				return ctx.db.delete(file._id);
+				return (async () => {
+					if (file.storageId) {
+						await ctx.storage.delete(file.storageId).catch(() => {
+							// ignore storage delete errors but don't stop DB cleanup
+						});
+					}
+					return ctx.db.delete(file._id);
+				})();
 			}),
 		);
 
+		await updateProjectTimestamp(ctx, args.projectId);
 		return { deletedCount: files.length };
 	},
 });
@@ -432,6 +434,7 @@ export const createBinaryFile = mutation({
 			updatedAt: now,
 		});
 
+		await updateProjectTimestamp(ctx, args.projectId, now);
 		return fileId;
 	},
 });

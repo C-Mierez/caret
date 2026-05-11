@@ -43,6 +43,7 @@ export default function ImportModal({ ...modalProps }: Props) {
 	} = useProjectImport();
 
 	const [isRedirecting, setIsRedirecting] = useState(false);
+	const [submitError, setSubmitError] = useState<string | null>(null);
 
 	const defaultValues = useMemo<ImportFormData>(
 		() => ({
@@ -58,6 +59,7 @@ export default function ImportModal({ ...modalProps }: Props) {
 		},
 		onSubmit: async ({ value }) => {
 			try {
+				setSubmitError(null);
 				const response = await importProject({
 					url: value.url,
 				});
@@ -71,8 +73,13 @@ export default function ImportModal({ ...modalProps }: Props) {
 					router.push(buildProjectUrl(response.projectId || ""));
 					closeModalSafe();
 				}, 500);
-			} catch {
-				toast.error(hookError || "Failed to import project");
+			} catch (error) {
+				const message =
+					error instanceof Error
+						? error.message
+						: hookError || "Failed to import project";
+				setSubmitError(message);
+				toast.error(message);
 			}
 		},
 	});
@@ -82,6 +89,7 @@ export default function ImportModal({ ...modalProps }: Props) {
 		if (modalProps.isOpen) {
 			form.reset(defaultValues);
 			setIsRedirecting(false);
+			setSubmitError(null);
 		}
 	}, [modalProps.isOpen, defaultValues, form]);
 
@@ -92,9 +100,10 @@ export default function ImportModal({ ...modalProps }: Props) {
 	const handleRetry = useCallback(() => {
 		form.reset(defaultValues);
 		setIsRedirecting(false);
+		setSubmitError(null);
 	}, [form, defaultValues]);
 
-	const isError = hookError && !isRedirecting;
+	const isError = submitError && !isRedirecting;
 
 	return (
 		<ResponsiveModal
@@ -129,7 +138,7 @@ export default function ImportModal({ ...modalProps }: Props) {
 							Import Failed
 						</h3>
 						<p className="text-muted-foreground text-sm">
-							{hookError ||
+							{submitError ||
 								"Something went wrong while importing your project. Please try again."}
 						</p>
 					</div>

@@ -40,7 +40,7 @@ export const getRecentMessages = query({
 				q.eq("conversationId", args.conversationId),
 			)
 			.order("desc")
-			.take(args.limit ?? 10);
+			.take(Math.max(1, Math.min(args.limit ?? 10, 1000)));
 
 		return messages.reverse();
 	},

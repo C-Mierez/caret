@@ -27,7 +27,17 @@ export async function POST(request: Request) {
 	}
 
 	const { projectId, url } = parsedRequest.data;
-	const { owner, repo } = parseGithubUrl(url);
+	let owner: string;
+	let repo: string;
+
+	try {
+		({ owner, repo } = parseGithubUrl(url));
+	} catch {
+		return NextResponse.json(
+			{ error: "Invalid GitHub URL" },
+			{ status: 400 },
+		);
+	}
 
 	const event = await inngest.send(
 		GithubImportCancelledEvent.create({

@@ -143,10 +143,15 @@ export const githubImport = inngest.createFunction(
 		// Get the repo tree
 		const repoTree = await step.run("get-repo-tree", async () => {
 			try {
+				const { data: repoData } = await octokit.rest.repos.get({
+					owner,
+					repo,
+				});
+
 				const { data } = await octokit.rest.git.getTree({
 					owner,
 					repo,
-					tree_sha: "main", // This should be a user input actually
+					tree_sha: repoData.default_branch,
 					recursive: "1",
 				});
 
@@ -157,6 +162,7 @@ export const githubImport = inngest.createFunction(
 					owner,
 					repo,
 				});
+				throw err;
 			}
 		});
 

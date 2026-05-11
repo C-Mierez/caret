@@ -140,40 +140,37 @@ export const messagesSent = inngest.createFunction(
 			"create-messages",
 			async () => {
 				const convexClient = await getMachineConvexClient(serviceToken);
+				const conversationId = event.data
+					.conversationId as Id<"conversations">;
 
-				// Create a use message for the conversation
-				const [userMessageId, assistantMessageId, recentMessages] =
-					await Promise.all([
-						convexClient.mutation(
-							api.system.conversations.createMessage,
-							{
-								content: event.data.message,
-								conversationId: event.data
-									.conversationId as Id<"conversations">,
-								projectId: conversation.projectId,
-								sender: "user",
-								status: "sent",
-							},
-						),
-						convexClient.mutation(
-							api.system.conversations.createMessage,
-							{
-								conversationId: event.data
-									.conversationId as Id<"conversations">,
-								projectId: conversation.projectId,
-								sender: "assistant",
-								status: "pending",
-							},
-						),
-						convexClient.query(
-							api.system.conversations.getRecentMessages,
-							{
-								conversationId: event.data
-									.conversationId as Id<"conversations">,
-								limit: 10,
-							},
-						),
-					]);
+				const userMessageId = await convexClient.mutation(
+					api.system.conversations.createMessage,
+					{
+						content: event.data.message,
+						conversationId,
+						projectId: conversation.projectId,
+						sender: "user",
+						status: "sent",
+					},
+				);
+
+				const assistantMessageId = await convexClient.mutation(
+					api.system.conversations.createMessage,
+					{
+						conversationId,
+						projectId: conversation.projectId,
+						sender: "assistant",
+						status: "pending",
+					},
+				);
+
+				const recentMessages = await convexClient.query(
+					api.system.conversations.getRecentMessages,
+					{
+						conversationId,
+						limit: 10,
+					},
+				);
 
 				return { userMessageId, assistantMessageId, recentMessages };
 			},

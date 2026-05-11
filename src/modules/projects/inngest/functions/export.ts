@@ -42,23 +42,6 @@ async function _executeCleanupSteps(
 				console.warn("Unable to fetch project during cleanup:", err);
 			}
 
-			// Clear the export repo URL and mark canceled
-			try {
-				await convexClient.mutation(
-					api.system.projects.updateExportStatus,
-					{
-						projectId: projectId,
-						exportStatus: "canceled",
-						exportRepoUrl: undefined,
-					},
-				);
-			} catch (err) {
-				console.error(
-					"Failed to clear export status during cleanup:",
-					err,
-				);
-			}
-
 			if (project?.exportRepoUrl) {
 				// We don't have a GitHub token here to delete the remote repo reliably.
 				// Log the url so the operator can manually remove it if desired.
@@ -66,6 +49,24 @@ async function _executeCleanupSteps(
 					"Export cleanup: remote repository exists but cannot be automatically deleted:",
 					project.exportRepoUrl,
 				);
+			}
+
+			if (project?.exportStatus !== "failed") {
+				try {
+					await convexClient.mutation(
+						api.system.projects.updateExportStatus,
+						{
+							projectId,
+							exportStatus: "canceled",
+							exportRepoUrl: undefined,
+						},
+					);
+				} catch (err) {
+					console.error(
+						"Failed to clear export status during cleanup:",
+						err,
+					);
+				}
 			}
 		});
 	} catch (err) {
@@ -173,6 +174,7 @@ export const githubExport = inngest.createFunction(
 		)) as Awaited<
 			ReturnType<typeof octokit.rest.repos.createForAuthenticatedUser>
 		>;
+		const defaultBranch = repo.default_branch ?? "main";
 
 		// Record the repo URL on the project so cleanup handlers can access it
 		await step.run("record-repo-url", async () => {
@@ -223,7 +225,7 @@ export const githubExport = inngest.createFunction(
 				const ref = await octokit.rest.git.getRef({
 					owner: user.login,
 					repo: repoName,
-					ref: "heads/main",
+					ref: `heads/${defaultBranch}`,
 				});
 
 				return { commitSha: ref.data.object?.sha ?? null };
@@ -335,7 +337,7 @@ export const githubExport = inngest.createFunction(
 			await octokit.rest.git.updateRef({
 				owner: user.login,
 				repo: repoName,
-				ref: "heads/main",
+				ref: `heads/${defaultBranch}`,
 				sha: newCommit.sha,
 			});
 		});
