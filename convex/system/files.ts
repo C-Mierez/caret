@@ -386,7 +386,7 @@ export const removeAllFilesFromProject = mutation({
 			}),
 		);
 
-		await updateProjectTimestamp(ctx, args.projectId);
+		await updateProjectTimestamp(ctx, args.projectId, Date.now());
 		return { deletedCount: files.length };
 	},
 });
